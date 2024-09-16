@@ -11,7 +11,7 @@
 <!-- : script setup lang="ts"> -->
 <script>
 export default {
-    name: 'ReleaseLinks',
+    name: 'ReleaseHeader',
     props: {
         href: {
             type: String,

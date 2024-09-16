@@ -2,7 +2,7 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 console.log("START");
 const note =
-	"\n# NOTE: This file is auto-generated in packages/releases-generator/build.ts\n# For corrections please edit it directly";
+	"\n# NOTE: This file is auto-generated in packages/releases-generator/build.ts based on Tauri releases on GitHub";
 const packages = [
 	{
 		name: "tauri",
@@ -85,27 +85,23 @@ async function generator() {
 				note,
 				`title: '${pkg.name}@${thisVersion}'`,
 				`description: '${thisVersion}'`,
-				`slug: 'release/${pkg.name}/v${thisVersion}'`,
-				"tableOfContents: false",
+				// `slug: 'release/${pkg.name}/v${thisVersion}'`,
+				// "tableOfContents: false",
 				`editUrl: 'https://github.com/tauri-apps/tauri-docs/packages/releases-generator/build.ts'`,
-				"pagefind: false",
-				"sidebar:",
-				`  label: ${thisVersion}`,
-				`  order: ${semverToInt(thisVersion)}`,
+				// "pagefind: false",
+				// "sidebar:",
+				// `  label: ${thisVersion}`,
+				`order: ${semverToInt(thisVersion)}`,
 			];
 
-			const segments = pkg.name.split("/");
-			const base = "../".repeat(segments.length + 1);
-
 			const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
-			const scriptImport = `<script setup>import Navigation from '${base}components/Navigation.vue'</script>`;
-			const linksDiv = `<Navigation href="${pkg.tag}/${pkg.name}-v${thisVersion}" />`;
+			const linksDiv = `<ReleaseHeader href="${pkg.tag}/${pkg.name}-v${thisVersion}" />`;
 
 			const basePath = join(baseDir, pkg.name);
 
 			writeFileSync(
 				join(basePath, `v${thisVersion}.md`),
-				`${frontmatter}\n\n${scriptImport}\n\n${linksDiv}\n\n${entitify(releases[i].notes)}`,
+				`${frontmatter}\n\n${linksDiv}\n\n${entitify(releases[i].notes)}`,
 			);
 		}
 	}

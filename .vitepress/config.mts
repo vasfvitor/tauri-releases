@@ -1,7 +1,4 @@
 import { defineConfig } from "vitepress";
-import { resolve, join } from "node:path";
-import path from "node:path";
-import { fileURLToPath, URL } from "node:url";
 
 import {
 	generateSidebar,
@@ -15,6 +12,7 @@ const vitepressSidebarOptions: VitePressSidebarOptions = {
 	collapsed: true,
 	collapseDepth: 1,
 	documentRootPath: srcDir,
+	sortMenusByFrontmatterOrder: true,
 };
 
 // https://vitepress.dev/reference/site-config
