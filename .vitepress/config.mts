@@ -24,13 +24,16 @@ export default defineConfig({
 		// https://vitepress.dev/reference/default-theme-config
 		nav: [
 			{ text: "Home", link: "/" },
-			{ text: "Examples", link: "/markdown-examples" },
+			{ text: "Documentation", link: "https://tauri.app/" },
 		],
 
 		sidebar: generateSidebar(vitepressSidebarOptions),
 
 		socialLinks: [
-			{ icon: "github", link: "https://github.com/vuejs/vitepress" },
+			{ icon: "github", link: "https://github.com/tauri-apps/tauri" },
+			{ icon: "discord", link: "https://discord.com/invite/tauri" },
+			{ icon: "twitter", link: "https://twitter.com/TauriApps" },
+			{ icon: "mastodon", link: "https://fosstodon.org/@TauriApps" },
 		],
 	},
 });

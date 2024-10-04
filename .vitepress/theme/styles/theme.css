@@ -1,0 +1,31 @@
+:root {
+	--hue-orange: 42;
+	--color-orange-low: hsl(var(--hue-orange), 100%, 15%);
+	--color-orange: hsl(var(--hue-orange), 100%, 60%);
+	--color-orange-high: hsl(var(--hue-orange), 100%, 90%);
+	--hue-blue: 186;
+	--color-blue-low: hsl(var(--hue-blue), 72%, 15%);
+	--color-blue: hsl(var(--hue-blue), 72%, 50%);
+	--color-blue-high: hsl(var(--hue-blue), 72%, 90%);
+	--hue-accent: var(--hue-blue);
+	--color-accent-low: var(--color-blue-low);
+	--color-accent: var(--color-blue);
+	--color-accent-high: var(--color-blue-high);
+
+	--color-white: #ffffff;
+	--color-gray-1: #eeeeee;
+	--color-gray-2: #c2c2c2;
+	--color-gray-3: #8b8b8b;
+	--color-gray-4: #585858;
+	--color-gray-5: #383838;
+	--color-gray-6: #272727;
+	--color-black: #181818;
+
+	/* Custom */
+	--tauri-transition-speed: 200ms;
+
+	--vp-c-brand-1: var(--color-orange);
+	--vp-c-brand-2: var(--color-orange-low);
+	--vp-c-brand-3: var(--color-orange-high);
+	--vp-c-brand-soft: var(--color-blue-low);
+}

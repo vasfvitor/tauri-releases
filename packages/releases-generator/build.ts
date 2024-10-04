@@ -1,6 +1,7 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
-console.log("START");
+import { rcompare } from "semver";
+
 const note =
 	"\n# NOTE: This file is auto-generated in packages/releases-generator/build.ts based on Tauri releases on GitHub";
 const packages = [
@@ -65,6 +66,10 @@ async function generator() {
 			.filter(({ version }) => !version.includes("Not Published"));
 
 		mkdirSync(join(baseDir, pkg.name), { recursive: true });
+
+		releases.sort((a, b) => {
+			return rcompare(a.version, b.version);
+		});
 		//
 		/*
 		 * Write files for each version
@@ -91,17 +96,17 @@ async function generator() {
 				// "pagefind: false",
 				// "sidebar:",
 				// `  label: ${thisVersion}`,
-				`order: ${semverToInt(thisVersion)}`,
+				`order: ${i}`,
 			];
 
 			const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
-			const linksDiv = `<ReleaseHeader href="${pkg.tag}/${pkg.name}-v${thisVersion}" />`;
+			const header = `<ReleaseHeader href="${pkg.tag}/${pkg.name}-v${thisVersion}" />`;
 
 			const basePath = join(baseDir, pkg.name);
 
 			writeFileSync(
 				join(basePath, `v${thisVersion}.md`),
-				`${frontmatter}\n\n${linksDiv}\n\n${entitify(releases[i].notes)}`,
+				`${frontmatter}\n\n${header}\n${entitify(releases[i].notes)}`,
 			);
 		}
 	}
@@ -169,32 +174,6 @@ function entitify(str: string): string {
 			}
 		})
 		.replace(/\$\{/g, "$\\{");
-}
-
-const PRE_RELEASE_VALUES = {
-	alpha: 1,
-	"beta-rc": 100,
-	beta: 1000,
-	rc: 100000,
-};
-
-function semverToInt(semver: string) {
-	const BASE = 1000000000;
-	const [version, preRelease] = semver.split("-");
-	const [major, minor, patch] = version.split(".").map(Number);
-	let preReleaseValue = 0;
-	if (preRelease) {
-		const match = preRelease.split(".");
-		if (match) {
-			const identifier = match[0];
-			const number = match[1] !== undefined ? Number.parseInt(match[1]) : 0;
-			preReleaseValue = PRE_RELEASE_VALUES[identifier] + number;
-		}
-	}
-	return (
-		BASE -
-		(major * 100000000 + minor * 1000000 + patch * 10000 + preReleaseValue)
-	);
 }
 
 generator();
