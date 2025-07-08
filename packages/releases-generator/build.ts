@@ -1,88 +1,12 @@
-// todo: add repo url and replace tag with /releases/tag and fix the table
-
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { rcompare } from "semver";
+import { repositories } from "./config";
+import { entitify } from "./utils";
+import type { Repository } from "./types";
 
 const note =
-	"\n# NOTE: This file is auto-generated in packages/releases-generator/build.ts based on Tauri releases on GitHub";
-const packages = [
-	{
-		name: "tauri",
-		changelog:
-			"https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri/CHANGELOG.md",
-		tag: "https://github.com/tauri-apps/tauri/releases/tag",
-		repoUrl: "https://github.com/tauri-apps/tauri/",
-		description: "runtime core",
-		source: "crates",
-		packageUrl: "https://crates.io/crates/tauri",
-	},
-	{
-		name: "@tauri-apps/api",
-		changelog:
-			"https://raw.githubusercontent.com/tauri-apps/tauri/dev/packages/api/CHANGELOG.md",
-		tag: "https://github.com/tauri-apps/tauri/releases/tag",
-		description: "JS API for interaction with Rust backend",
-		source: "npm",
-		packageUrl: "https://www.npmjs.com/package/@tauri-apps/api",
-	},
-	{
-		name: "tauri-cli",
-		changelog:
-			"https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-cli/CHANGELOG.md",
-		tag: "https://github.com/tauri-apps/tauri/releases/tag",
-		description: "create, develop and build apps",
-		source: "crates",
-		packageUrl: "https://crates.io/crates/tauri-cli",
-	},
-	{
-		name: "@tauri-apps/cli",
-		changelog:
-			"https://raw.githubusercontent.com/tauri-apps/tauri/dev/packages/cli/CHANGELOG.md",
-		tag: "https://github.com/tauri-apps/tauri/releases/tag",
-		description: "Node.js CLI wrapper for `tauri-cli`",
-		source: "npm",
-		packageUrl: "https://www.npmjs.com/package/@tauri-apps/cli",
-	},
-	{
-		name: "tauri-bundler",
-		changelog:
-			"https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-bundler/CHANGELOG.md",
-		tag: "https://github.com/tauri-apps/tauri/releases/tag",
-		description: "manufacture the final binaries",
-		source: "crates",
-		packageUrl: "https://crates.io/crates/tauri-bundler",
-	},
-	{
-		name: "wry",
-		changelog:
-			"https://raw.githubusercontent.com/tauri-apps/wry/dev/CHANGELOG.md",
-		tag: "https://github.com/tauri-apps/wry/releases/tag",
-		description: "enables webview and native integration",
-		source: "crates",
-		packageUrl: "https://crates.io/crates/wry",
-	},
-	{
-		name: "tao",
-		changelog:
-			"https://raw.githubusercontent.com/tauri-apps/tao/dev/CHANGELOG.md",
-		tag: "https://github.com/tauri-apps/tao/releases/tag",
-		description: "abstracts over OS-specific APIs",
-		source: "crates",
-		packageUrl: "https://crates.io/crates/tao",
-	},
-	{
-		name: "create-tauri-app",
-		changelog:
-			"	https://raw.githubusercontent.com/tauri-apps/create-tauri-app/dev/CHANGELOG.md",
-		tag: "https://github.com/tauri-apps/create-tauri-app/releases/tag",
-		description: "get started with your first Tauri app",
-		source: "npm",
-		packageUrl: "https://www.npmjs.com/package/create-tauri-app",
-	},
-];
-
-type Package = (typeof packages)[0];
+	"\n# NOTE: This file is auto-generated in packages/releases-generator/build.ts based on releases on GitHub";
 
 const baseDir = "../../src/content";
 
@@ -90,9 +14,45 @@ const latestVersions: {
 	[key: string]: string;
 } = {};
 
+function getAllPackages() {
+	const allPackages = [];
+
+	for (const repo of repositories) {
+		const [owner, repoName] = repo.repoUrl
+			.replace("https://github.com/", "")
+			.split("/");
+		const rawContentUrl = `https://raw.githubusercontent.com/${owner}/${repoName}/dev`;
+
+		for (const pkg of repo.packages) {
+			const changelogPath = pkg.path
+				? `${pkg.path}/CHANGELOG.md`
+				: "CHANGELOG.md";
+			const changelogUrl = `${rawContentUrl}/${changelogPath}`;
+
+			allPackages.push({
+				name: pkg.name,
+				changelog: changelogUrl,
+				tag: `${repo.repoUrl}/releases/tag`,
+				repoUrl: repo.repoUrl,
+				description: pkg.description,
+				source: pkg.source,
+				packageUrl: pkg.packageUrl,
+			});
+		}
+	}
+	return allPackages;
+}
+
+const packages = getAllPackages();
+
+writeFileSync(
+	join(baseDir, "packages.json"),
+	JSON.stringify(packages, null, 2),
+);
+
 async function generator() {
 	for (const pkg of packages) {
-		const response = await fetch(pkg.changelog);
+		const response = await fetch(pkg.changelog.trim());
 		const responseText: string = await response.text();
 		const releases = responseText
 			.split("## \\[")
@@ -148,6 +108,23 @@ async function generator() {
 				`${frontmatter}\n\n${header}\n${entitify(releases[i].notes)}`,
 			);
 		}
+
+		const allFrontmatter = [
+			note,
+			`title: '${pkg.name} – All Releases'`,
+			`description: 'All changelog entries for ${pkg.name}'`,
+			`editUrl: 'https://github.com/tauri-apps/tauri-docs/packages/releases-generator/build.ts'`,
+			"order: 0",
+		];
+		const allHeader = `<ReleaseHeader href="${pkg.repoUrl} />`;
+		let allContent = `${allHeader}\n`;
+		for (const rel of releases) {
+			allContent += `\n\n## v${rel.version}\n\n${entitify(rel.notes)}`;
+		}
+		writeFileSync(
+			join(baseDir, pkg.name, "All Versions.md"),
+			`${["---", ...allFrontmatter, "---"].join("\n")}\n\n${allContent}`,
+		);
 	}
 
 	// Generate index page
@@ -161,7 +138,7 @@ async function generator() {
 		"---",
 	].join("\n");
 
-	const releasesTable = generateReleaseTable(packages);
+	const releasesTable = generateReleaseTables(repositories);
 
 	const indexPageContent = releasesTable;
 
@@ -171,38 +148,28 @@ async function generator() {
 	);
 }
 
-function generateReleaseTable(packages: Package[]) {
-	let table = `
-| Component | Description | Version |
-|-----------|-------------|---------|
-`;
+function generateReleaseTables(repositories: Repository[]): string {
+	let markdownOutput = "";
 
-	for (const pkg of packages) {
-		table += `| [**${pkg.name}**](${pkg.tag}) | ${pkg.description} | [![${pkg.name} version badge](https://img.shields.io/${pkg.source}/v/${pkg.name}.svg)](${pkg.packageUrl}}) |\n`;
+	for (const repo of repositories) {
+		// summary table header
+		const repoSlug = repo.repoUrl
+			.replace("https://github.com/", "")
+			.replace(/\/$/, "");
+		markdownOutput += `### ${repo.displayName} [${repoSlug}](${repo.repoUrl})\n\n`;
+		markdownOutput += "| Component | Description | Version |\n";
+		markdownOutput += "|-----------|-------------|---------|\n";
+
+		for (const pkg of repo.packages) {
+			const packageNameLink = `[**${pkg.name}**](${pkg.packageUrl})`;
+			const versionBadge = `[![${pkg.name} version badge](https://img.shields.io/${pkg.source}/v/${pkg.name}.svg)](${pkg.packageUrl})`;
+
+			markdownOutput += `| ${packageNameLink} | ${pkg.description} | ${versionBadge} |\n`;
+		}
+		markdownOutput += "\n";
 	}
 
-	return table;
-}
-
-function entitify(str: string): string {
-	return str
-		.replace(/[&<>"']/g, (entity) => {
-			switch (entity) {
-				case "&":
-					return "&amp;";
-				case "<":
-					return "&lt;";
-				case ">":
-					return "&gt;";
-				case '"':
-					return "&quot;";
-				case "'":
-					return "&#39;";
-				default:
-					return entity;
-			}
-		})
-		.replace(/\$\{/g, "$\\{");
+	return markdownOutput.trim();
 }
 
 generator();
