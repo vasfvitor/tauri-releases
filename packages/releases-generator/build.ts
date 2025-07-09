@@ -1,7 +1,7 @@
 import type { Package, Repository } from "./types";
 
 import { writeIndexPage } from "./table";
-import { generateVersionPages } from "./page";
+import { fetchData, writeOutputToJson } from "./dataFetch";
 import { repositories } from "./config";
 
 function getAllPackages(repositoriesList: Repository[]): {
@@ -80,12 +80,12 @@ function getAllPackages(repositoriesList: Repository[]): {
 	return { packages: allPackages, markdownOutput };
 }
 
-const { packages: global_packages, markdownOutput } =
-	getAllPackages(repositories);
+// const { packages: global_packages, markdownOutput } =
+// getAllPackages(repositories);
 
 async function main() {
-	await generateVersionPages(global_packages);
-	writeIndexPage(markdownOutput);
+	const data = await fetchData(repositories);
+	writeOutputToJson(data);
 }
 
 main();

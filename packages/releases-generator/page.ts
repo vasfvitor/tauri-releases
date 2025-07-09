@@ -1,29 +1,27 @@
-import type { Package, Release } from "./types";
-
-import { mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { mkdirSync, writeFileSync } from "fs";
+import { join } from "path";
 import { rcompare } from "semver";
 import { baseDir, note } from "./config";
+import { Package, Release } from "./types";
 import { entitify } from "./utils";
-import { fetchWithCache } from "./cache";
 
-export async function generateVersionPages(packages: Package[]): Promise<{
-	[key: string]: string;
-}> {
-	const latestVersions: {
-		[key: string]: string;
-	} = {};
+const latestVersions: { [key: string]: string } = {};
 
+export async function generateVersionPages(packages: Package[]) {
 	for (const pkg of packages) {
 		const workingDir = join(baseDir, pkg.group || "", pkg.name);
 
 		try {
 			console.log(`Processing ${pkg.name}...`);
-			const responseText = await fetchWithCache(pkg.changelog.trim(), 1000);
+			const responseText = changelogs[pkg.name];
 
-			// ehmmm...
+			if (!responseText) {
+				console.warn(`No changelog found for ${pkg.name}`);
+				continue;
+			}
+
 			const releases: Release[] = responseText
-				.split("## \\[")
+				.split("## [")
 				.filter((item) => !item.includes("# Changelog"))
 				.map((section) => {
 					const [version, ...c] = section.split("\n");

@@ -10,4 +10,5 @@ review packages list and copy
 create weekly-ish cache to be used on pr previews? also locally, to avoid rate-limitting and you know
 update biome
 
-find cache library
+
+make use of dynamic routing instead of generating
