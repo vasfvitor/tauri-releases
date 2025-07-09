@@ -1,7 +1,7 @@
 import fetch from "make-fetch-happen";
-import { appendFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
-import type { Repository } from "./types";
+import { appendFileSync } from "node:fs";
+
+import type { PackageData, Repository } from "./types";
 
 const fetchWithCache = async (
 	url: string,
@@ -15,30 +15,6 @@ const fetchWithCache = async (
 	}
 	return response.text();
 };
-
-export interface NpmData {
-	id: string;
-	name: string;
-	versions: Record<string, string>;
-}
-
-export interface CratesData {
-	id: string;
-	name: string;
-	versions: Record<string, string>;
-}
-
-// CHANGELOG.MD file with all versions
-export type RawMarkdown = string;
-
-export interface PackageData {
-	[packageName: string]: {
-		group?: string;
-		changelogs: RawMarkdown;
-		npmData: NpmData;
-		cratesData: CratesData;
-	};
-}
 
 function logError(message: string, error: unknown) {
 	const logMessage = `${new Date().toISOString()} - ${message}: ${
@@ -110,6 +86,11 @@ export async function fetchData(
 					try {
 						const npmResponse = await fetchWithCache(npmUrl, `npm/${pkg.name}`);
 						const rawData = JSON.parse(npmResponse);
+						const versions = rawData.time;
+
+						delete versions.created;
+						delete versions.modified;
+
 						data[pkg.name].npmData = {
 							id: rawData._id,
 							name: rawData.name,
@@ -147,14 +128,4 @@ export async function fetchData(
 	}
 
 	return data;
-}
-
-export function writeOutputToJson(output: PackageData): void {
-	const path = "generated";
-	mkdirSync(path, { recursive: true });
-
-	const filePath = join(path, "data.json");
-	writeFileSync(filePath, JSON.stringify(output, null, 2), "utf-8");
-
-	console.log(`done: ${filePath}`);
 }

@@ -25,3 +25,37 @@ export type Release = {
 	version: string;
 	notes: string;
 };
+
+//
+
+export interface NpmData {
+	id: string;
+	name: string;
+	versions: Record<string, string | undefined>; // Allow undefined values
+}
+
+export interface CratesData {
+	id: string;
+	name: string;
+	versions: Record<string, string | undefined>; // Allow undefined values
+}
+
+// CHANGELOG.MD file with all versions
+export type RawMarkdown = string;
+
+export interface PackageData {
+	[packageName: string]: {
+		group?: string;
+		changelogs: RawMarkdown;
+		npmData: NpmData;
+		cratesData: CratesData;
+	};
+}
+
+export interface TablePackageData {
+	packageName: string;
+	group?: string;
+	changelogs: RawMarkdown;
+	npmData: NpmData;
+	cratesData: CratesData;
+}

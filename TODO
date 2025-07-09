@@ -12,3 +12,10 @@ update biome
 
 
 make use of dynamic routing instead of generating
+
+
+https://crates.io/api/v1/crates/tauri
+https://raw.githubusercontent.com/tauri-apps/plugins-workspace/refs/heads/v2/plugins/window-state/CHANGELOG.md
+https://raw.githubusercontent.com/tauri-apps/plugins-workspace/v2/plugins/dialog/CHANGELOG.md
+https://registry.npmjs.org/@tauri-apps/api
+https://github.com/nextapps-de/flexsearch

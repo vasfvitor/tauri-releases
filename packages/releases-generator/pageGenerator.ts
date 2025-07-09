@@ -106,6 +106,8 @@ function generateIndexPage(packages: string[]): void {
 		"",
 		"## Packages",
 		"",
+		"<ReleasesTable/>",
+		"",
 		packageLinks,
 	].join("\n");
 

@@ -1,9 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { fetchData, writeOutputToJson } from "./dataFetch";
+import { fetchData } from "./dataFetch";
 import { repositories } from "./config";
-import type { PackageData } from "./dataFetch";
 import { generatePages } from "./pageGenerator";
+import type { PackageData } from "./types";
+import { flatten, writeOutputToJson } from "./utils";
 
 async function buildSite() {
 	const dataFilePath = join("generated", "data.json");
@@ -14,8 +15,12 @@ async function buildSite() {
 		packageData = JSON.parse(rawData);
 	} else {
 		packageData = await fetchData(repositories);
-		writeOutputToJson(packageData);
+		writeOutputToJson(packageData, "data.json");
 	}
+
+	const tablePackageData = flatten(packageData);
+	writeOutputToJson(tablePackageData, "tableData.json");
+
 	console.log("generating pages...");
 	generatePages(packageData);
 }
