@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 import { rcompare } from "semver";
 import { baseDir, note } from "./config";
-import { Package, Release } from "./types";
+import type { Package, Release } from "./types";
 import { entitify } from "./utils";
 
 const latestVersions: { [key: string]: string } = {};

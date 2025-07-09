@@ -103,7 +103,7 @@ export const repositories = [
 		packages: [
 			{
 				name: "wry",
-				githubPath: "", // root
+				githubPath: "__root__",
 				description: "Cross-platform WebView rendering library in Rust.",
 				cratesPath: "wry",
 			},
@@ -116,7 +116,7 @@ export const repositories = [
 		packages: [
 			{
 				name: "tao",
-				githubPath: "", // root
+				githubPath: "__root__",
 				description:
 					"Cross-platform application window creation library in Rust.",
 				cratesPath: "tao",
@@ -130,7 +130,7 @@ export const repositories = [
 		packages: [
 			{
 				name: "create-tauri-app",
-				githubPath: "", // root
+				githubPath: "__root__",
 				description: "Rapidly scaffold out a new Tauri project.",
 				npmPath: "create-tauri-app",
 			},

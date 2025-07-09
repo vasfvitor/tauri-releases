@@ -16,26 +16,28 @@ const fetchWithCache = async (
 	return response.text();
 };
 
-// todo: define types that we need
-interface NpmData {
+export interface NpmData {
 	id: string;
 	name: string;
-	versions: Record<string, unknown>;
-}
-
-interface CratesData {
-	id: string;
-	name: string;
-	updatedAt: string;
 	versions: Record<string, string>;
 }
 
-type RawMarkdown = string;
+export interface CratesData {
+	id: string;
+	name: string;
+	versions: Record<string, string>;
+}
 
-interface PackageData {
-	changelogs: Record<string, RawMarkdown>;
-	npmData: Record<string, NpmData>;
-	cratesData: Record<string, CratesData>;
+// CHANGELOG.MD file with all versions
+export type RawMarkdown = string;
+
+export interface PackageData {
+	[packageName: string]: {
+		group?: string;
+		changelogs: RawMarkdown;
+		npmData: NpmData;
+		cratesData: CratesData;
+	};
 }
 
 function logError(message: string, error: unknown) {
@@ -64,28 +66,35 @@ function formatCrateVersion(versions: CrateVersion[]): Record<string, string> {
 export async function fetchData(
 	repositories: Repository[],
 ): Promise<PackageData> {
-	const changelogs: { [key: string]: string } = {};
-	const npmData: Record<string, NpmData> = {};
-	const cratesData: Record<string, CratesData> = {};
+	const data: PackageData = {};
 
 	for (const repo of repositories) {
 		for (const pkg of repo.packages) {
+			if (!data[pkg.name]) {
+				data[pkg.name] = {
+					group: repo.packages.length > 1 ? repo.name : "",
+					changelogs: "",
+					npmData: { id: "", name: "", versions: {} },
+					cratesData: { id: "", name: "", versions: {} },
+				};
+			}
+
+			const { githubPath, npmPath, cratesPath } = pkg;
+			console.log(`fetching ${pkg.name}...`);
 			try {
-				console.log(`fetching ${pkg.name}...`);
-
-				const { githubPath, npmPath, cratesPath } = pkg;
-
 				if (githubPath) {
+					const path = githubPath === "__root__" ? "" : githubPath;
 					const rawUrl = repo.repoUrl.replace(
 						"github.com",
 						"raw.githubusercontent.com",
 					);
-					const githubUrl = githubPath
-						? `${rawUrl}/${repo.branch || "dev"}/${githubPath}/CHANGELOG.md`
-						: `${rawUrl}/CHANGELOG.md`;
+					const branch = repo.branch || "dev";
+					const githubUrl = path
+						? `${rawUrl}/${branch}/${path}/CHANGELOG.md`
+						: `${rawUrl}/${branch}/CHANGELOG.md`;
 
 					try {
-						changelogs[pkg.name] = await fetchWithCache(
+						data[pkg.name].changelogs = await fetchWithCache(
 							githubUrl,
 							`changelogs/${pkg.name}`,
 						);
@@ -94,18 +103,18 @@ export async function fetchData(
 						logError(`failed ${pkg.name} - ${githubUrl}`, error);
 					}
 				}
+				// todo: else warn missing
 
 				if (npmPath) {
 					const npmUrl = `https://registry.npmjs.org/${npmPath}`;
 					try {
 						const npmResponse = await fetchWithCache(npmUrl, `npm/${pkg.name}`);
 						const rawData = JSON.parse(npmResponse);
-						npmData[pkg.name] = {
+						data[pkg.name].npmData = {
 							id: rawData._id,
 							name: rawData.name,
 							// object keyed by version - time
 							versions: rawData.time,
-							time: rawData.time,
 						};
 						logOk(`fetched npm data for ${pkg.name}`, npmUrl);
 					} catch (error) {
@@ -121,10 +130,9 @@ export async function fetchData(
 							`crates/${pkg.name}`,
 						);
 						const rawData = JSON.parse(cratesResponse);
-						cratesData[pkg.name] = {
+						data[pkg.name].cratesData = {
 							id: rawData.crate.id,
 							name: rawData.crate.name,
-							updatedAt: rawData.crate.updated_at,
 							versions: formatCrateVersion(rawData.versions || []),
 						};
 						logOk(`fetched crates data for ${pkg.name}`, cratesUrl);
@@ -138,14 +146,9 @@ export async function fetchData(
 		}
 	}
 
-	return {
-		changelogs,
-		npmData,
-		cratesData,
-	};
+	return data;
 }
 
-// Function to write the output to a JSON file in the VitePress /api directory
 export function writeOutputToJson(output: PackageData): void {
 	const path = "generated";
 	mkdirSync(path, { recursive: true });
