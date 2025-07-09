@@ -1,0 +1,11 @@
+# TODO
+
+edit url
+action to build weekly
+warning about last update
+report issue url
+issue template?
+update to vitepress 2 when it goes live, and sidebar updates to vitepress 2
+review packages list and copy
+create weekly-ish cache to be used on pr previews? also locally, to avoid rate-limitting and you know
+update biome

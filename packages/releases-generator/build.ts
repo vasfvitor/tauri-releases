@@ -1,158 +1,29 @@
-import { writeFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
-import { rcompare } from "semver";
+import type { Package, Repository } from "./types";
+
+import { writeIndexPage } from "./table";
+import { generateVersionPages } from "./page";
 import { repositories } from "./config";
-import { entitify } from "./utils";
-import type { Repository } from "./types";
 
-const note =
-	"\n# NOTE: This file is auto-generated in packages/releases-generator/build.ts based on releases on GitHub";
-
-const baseDir = "../../src/content";
-
-const latestVersions: {
-	[key: string]: string;
-} = {};
-
-function getAllPackages() {
+function getAllPackages(repositoriesList: Repository[]): {
+	packages: Package[];
+	markdownOutput: string;
+} {
+	let markdownOutput = "";
 	const allPackages = [];
 
-	for (const repo of repositories) {
+	for (const repo of repositoriesList) {
 		const [owner, repoName] = repo.repoUrl
 			.replace("https://github.com/", "")
 			.split("/");
-		const rawContentUrl = `https://raw.githubusercontent.com/${owner}/${repoName}/dev`;
 
-		for (const pkg of repo.packages) {
-			const changelogPath = pkg.path
-				? `${pkg.path}/CHANGELOG.md`
-				: "CHANGELOG.md";
-			const changelogUrl = `${rawContentUrl}/${changelogPath}`;
+		// todo: define branch?
+		const group = repo.packages.length > 1 ? repo.name : null;
+		const branch = repo.branch || "dev";
 
-			allPackages.push({
-				name: pkg.name,
-				changelog: changelogUrl,
-				tag: `${repo.repoUrl}/releases/tag`,
-				repoUrl: repo.repoUrl,
-				description: pkg.description,
-				source: pkg.source,
-				packageUrl: pkg.packageUrl,
-			});
-		}
-	}
-	return allPackages;
-}
+		// todo use github api?
+		const rawContentUrl = `https://raw.githubusercontent.com/${owner}/${repoName}/${branch}`;
 
-const packages = getAllPackages();
-
-writeFileSync(
-	join(baseDir, "packages.json"),
-	JSON.stringify(packages, null, 2),
-);
-
-async function generator() {
-	for (const pkg of packages) {
-		const response = await fetch(pkg.changelog.trim());
-		const responseText: string = await response.text();
-		const releases = responseText
-			.split("## \\[")
-			.filter((item) => !item.includes("# Changelog"))
-			.map((section) => {
-				const [version, ...c] = section.split("\n");
-				const contents = c.join("\n");
-				return {
-					version: version.replace("\\[", "").replace("]", ""),
-					notes: contents,
-				};
-			})
-			.filter(({ version }) => !version.includes("Not Published"));
-
-		mkdirSync(join(baseDir, pkg.name), { recursive: true });
-
-		releases.sort((a, b) => {
-			return rcompare(a.version, b.version);
-		});
-		//
-		/*
-		 * Write files for each version
-		 */
-		const len = releases.length;
-		for (let i = 0; i < len; i++) {
-			const thisVersion = releases[i].version;
-
-			if (i === 0) {
-				// latest version
-				latestVersions[pkg.name] = `v${thisVersion}`;
-			}
-			//
-			const pageFrontmatter = [
-				note,
-				`title: '${pkg.name}@${thisVersion}'`,
-				`description: '${thisVersion}'`,
-				// `slug: 'release/${pkg.name}/v${thisVersion}'`,
-				// "tableOfContents: false",
-				`editUrl: 'https://github.com/tauri-apps/tauri-docs/packages/releases-generator/build.ts'`,
-				// "pagefind: false",
-				// "sidebar:",
-				// `  label: ${thisVersion}`,
-				`order: ${i}`,
-			];
-
-			const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
-			const header = `<ReleaseHeader href="${pkg.tag}/${pkg.name}-v${thisVersion}" />`;
-
-			const basePath = join(baseDir, pkg.name);
-
-			writeFileSync(
-				join(basePath, `v${thisVersion}.md`),
-				`${frontmatter}\n\n${header}\n${entitify(releases[i].notes)}`,
-			);
-		}
-
-		const allFrontmatter = [
-			note,
-			`title: '${pkg.name} – All Releases'`,
-			`description: 'All changelog entries for ${pkg.name}'`,
-			`editUrl: 'https://github.com/tauri-apps/tauri-docs/packages/releases-generator/build.ts'`,
-			"order: 0",
-		];
-		const allHeader = `<ReleaseHeader href="${pkg.repoUrl} />`;
-		let allContent = `${allHeader}\n`;
-		for (const rel of releases) {
-			allContent += `\n\n## v${rel.version}\n\n${entitify(rel.notes)}`;
-		}
-		writeFileSync(
-			join(baseDir, pkg.name, "All Versions.md"),
-			`${["---", ...allFrontmatter, "---"].join("\n")}\n\n${allContent}`,
-		);
-	}
-
-	// Generate index page
-	const extraNote =
-		"# To quickly preview changes, you can edit this file, then make sure you copy the changes over the source build.ts script\n";
-	const indexPage = [
-		"---",
-		note,
-		extraNote,
-		`title: 'Tauri Core Ecosystem Releases'`,
-		"---",
-	].join("\n");
-
-	const releasesTable = generateReleaseTables(repositories);
-
-	const indexPageContent = releasesTable;
-
-	writeFileSync(
-		join(baseDir, "index.md"),
-		`${indexPage}\n\n${indexPageContent}`,
-	);
-}
-
-function generateReleaseTables(repositories: Repository[]): string {
-	let markdownOutput = "";
-
-	for (const repo of repositories) {
-		// summary table header
+		// this could be in a separate function
 		const repoSlug = repo.repoUrl
 			.replace("https://github.com/", "")
 			.replace(/\/$/, "");
@@ -161,15 +32,60 @@ function generateReleaseTables(repositories: Repository[]): string {
 		markdownOutput += "|-----------|-------------|---------|\n";
 
 		for (const pkg of repo.packages) {
-			const packageNameLink = `[**${pkg.name}**](${pkg.packageUrl})`;
-			const versionBadge = `[![${pkg.name} version badge](https://img.shields.io/${pkg.source}/v/${pkg.name}.svg)](${pkg.packageUrl})`;
+			const changelog = pkg.path
+				? `${rawContentUrl}/${pkg.path}/CHANGELOG.md`
+				: `${rawContentUrl}/CHANGELOG.md`;
+			const data = {
+				tag: `${repo.repoUrl}/releases/tag`,
+				parentUrl: repo.repoUrl,
+				description: repo.displayName,
+				url: `${repo.repoUrl}/tree/${branch}/${pkg.path || ""}`,
+				name: pkg.name,
+				group,
+				changelog,
+				packages: repo.packages,
+			};
+			allPackages.push(data);
 
-			markdownOutput += `| ${packageNameLink} | ${pkg.description} | ${versionBadge} |\n`;
+			// summary for table
+			const componentLinks = [];
+			const versionBadges = [];
+
+			if (pkg.cargo) {
+				const cargoName = pkg.cargo.split("/").pop();
+				componentLinks.push(`[**${pkg.name} (crate)**](${pkg.cargo})`);
+				versionBadges.push(
+					`[![crates.io version](https://img.shields.io/crates/v/${cargoName}.svg)](${pkg.cargo})`,
+				);
+			}
+
+			if (pkg.npm) {
+				const npmUrl = new URL(pkg.npm);
+				const npmName = npmUrl.pathname.replace("/package/", "");
+				componentLinks.push(`[**${pkg.name} (npm)**](${pkg.npm})`);
+				versionBadges.push(
+					`[![npm version](https://img.shields.io/npm/v/${npmName}.svg)](${pkg.npm})`,
+				);
+			}
+
+			const packageNameLink = componentLinks.join("<br>");
+			const version = versionBadges.join("<br>");
+			const row = `| ${packageNameLink} | ${pkg.description} | ${version} |\n`;
+
+			markdownOutput += row;
 		}
 		markdownOutput += "\n";
 	}
 
-	return markdownOutput.trim();
+	return { packages: allPackages, markdownOutput };
 }
 
-generator();
+const { packages: global_packages, markdownOutput } =
+	getAllPackages(repositories);
+
+async function main() {
+	await generateVersionPages(global_packages);
+	writeIndexPage(markdownOutput);
+}
+
+main();

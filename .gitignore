@@ -2,3 +2,4 @@
 .vitepress/cache
 node_modules
 src/content
+packages/releases-generator/.cache
