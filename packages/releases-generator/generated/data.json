@@ -387,8 +387,6 @@
       "id": "@tauri-apps/api",
       "name": "@tauri-apps/api",
       "versions": {
-        "created": "2021-04-13T22:39:47.265Z",
-        "modified": "2025-06-24T19:18:00.210Z",
         "0.0.0": "2021-04-13T22:39:47.562Z",
         "1.0.0-beta-rc.0": "2021-04-14T14:00:45.484Z",
         "1.0.0-beta-rc.1": "2021-04-14T23:46:02.150Z",
@@ -492,8 +490,6 @@
       "id": "@tauri-apps/cli",
       "name": "@tauri-apps/cli",
       "versions": {
-        "created": "2021-04-13T22:40:24.987Z",
-        "modified": "2025-06-28T21:32:03.523Z",
         "0.0.0": "2021-04-13T22:40:25.321Z",
         "1.0.0-beta-rc.0": "2021-04-14T17:22:38.522Z",
         "1.0.0-beta-rc.1": "2021-04-14T23:49:21.161Z",
@@ -1878,8 +1874,6 @@
       "id": "create-tauri-app",
       "name": "create-tauri-app",
       "versions": {
-        "created": "2020-08-15T14:25:40.302Z",
-        "modified": "2024-12-25T02:39:00.705Z",
         "0.0.0": "2020-08-15T14:25:40.428Z",
         "1.0.0-beta-rc.0": "2021-04-14T21:32:36.758Z",
         "1.0.0-beta-rc.1": "2021-04-14T22:04:35.921Z",
@@ -2039,8 +2033,6 @@
       "id": "@tauri-apps/plugin-autostart",
       "name": "@tauri-apps/plugin-autostart",
       "versions": {
-        "created": "2023-05-24T14:25:28.802Z",
-        "modified": "2025-06-25T14:32:51.786Z",
         "2.0.0-alpha.0": "2023-05-24T14:25:28.970Z",
         "2.0.0-alpha.1": "2023-08-14T20:41:20.987Z",
         "2.0.0-alpha.2": "2023-10-23T14:25:24.961Z",
@@ -2105,8 +2097,6 @@
       "id": "@tauri-apps/plugin-barcode-scanner",
       "name": "@tauri-apps/plugin-barcode-scanner",
       "versions": {
-        "created": "2023-09-14T14:47:16.523Z",
-        "modified": "2025-06-25T14:33:03.722Z",
         "2.0.0-alpha.0": "2023-09-14T14:47:16.841Z",
         "2.0.0-alpha.1": "2023-10-23T14:28:23.710Z",
         "2.0.0-alpha.2": "2023-10-29T19:33:56.773Z",
@@ -2170,8 +2160,6 @@
       "id": "@tauri-apps/plugin-biometric",
       "name": "@tauri-apps/plugin-biometric",
       "versions": {
-        "created": "2023-12-20T03:14:34.797Z",
-        "modified": "2025-06-25T14:33:16.624Z",
         "2.0.0-alpha.0": "2023-12-20T03:14:35.081Z",
         "2.0.0-beta.0": "2024-02-03T21:57:35.790Z",
         "2.0.0-beta.1": "2024-02-21T17:51:56.596Z",
@@ -2226,8 +2214,6 @@
       "id": "@tauri-apps/plugin-clipboard-manager",
       "name": "@tauri-apps/plugin-clipboard-manager",
       "versions": {
-        "created": "2023-05-24T15:13:08.092Z",
-        "modified": "2025-06-25T14:33:40.463Z",
         "2.0.0-alpha.0": "2023-05-24T15:13:08.304Z",
         "2.0.0-alpha.1": "2023-08-14T20:50:15.825Z",
         "2.0.0-alpha.2": "2023-10-23T14:34:36.546Z",
@@ -2301,8 +2287,6 @@
       "id": "@tauri-apps/plugin-deep-link",
       "name": "@tauri-apps/plugin-deep-link",
       "versions": {
-        "created": "2023-09-14T14:51:08.631Z",
-        "modified": "2025-06-25T14:33:51.242Z",
         "2.0.0-alpha.0": "2023-09-14T14:51:08.945Z",
         "2.0.0-alpha.1": "2023-10-23T14:37:38.350Z",
         "2.0.0-alpha.2": "2023-10-29T19:46:24.862Z",
@@ -2379,8 +2363,6 @@
       "id": "@tauri-apps/plugin-dialog",
       "name": "@tauri-apps/plugin-dialog",
       "versions": {
-        "created": "2023-05-24T15:26:57.348Z",
-        "modified": "2025-06-25T14:34:15.777Z",
         "2.0.0-alpha.0": "2023-05-24T15:26:57.649Z",
         "2.0.0-alpha.1": "2023-08-14T20:58:54.379Z",
         "2.0.0-alpha.2": "2023-10-23T14:43:44.689Z",
@@ -2461,8 +2443,6 @@
       "id": "@tauri-apps/plugin-fs",
       "name": "@tauri-apps/plugin-fs",
       "versions": {
-        "created": "2023-05-24T15:23:08.580Z",
-        "modified": "2025-06-25T14:34:03.915Z",
         "2.0.0-alpha.0": "2023-05-24T15:23:08.805Z",
         "2.0.0-alpha.1": "2023-08-14T20:54:41.197Z",
         "2.0.0-alpha.2": "2023-10-23T14:40:41.987Z",
@@ -2545,8 +2525,6 @@
       "id": "@tauri-apps/plugin-global-shortcut",
       "name": "@tauri-apps/plugin-global-shortcut",
       "versions": {
-        "created": "2023-05-24T15:30:38.016Z",
-        "modified": "2025-06-25T14:34:41.001Z",
         "2.0.0-alpha.0": "2023-05-24T15:30:38.287Z",
         "2.0.0-alpha.1": "2023-08-14T21:03:05.774Z",
         "2.0.0-alpha.2": "2023-10-23T14:46:45.241Z",
@@ -2609,8 +2587,6 @@
       "id": "@tauri-apps/plugin-http",
       "name": "@tauri-apps/plugin-http",
       "versions": {
-        "created": "2023-05-24T15:34:17.897Z",
-        "modified": "2025-06-25T14:35:17.526Z",
         "2.0.0-alpha.0": "2023-05-24T15:34:18.184Z",
         "2.0.0-alpha.1": "2023-08-14T21:07:17.002Z",
         "2.0.0-alpha.2": "2023-10-23T14:49:46.180Z",
@@ -2703,8 +2679,6 @@
       "id": "@tauri-apps/plugin-log",
       "name": "@tauri-apps/plugin-log",
       "versions": {
-        "created": "2023-05-24T16:19:54.535Z",
-        "modified": "2025-06-25T14:35:34.894Z",
         "2.0.0-alpha.0": "2023-05-24T16:19:54.801Z",
         "2.0.0-alpha.1": "2023-08-14T21:27:19.480Z",
         "2.0.0-alpha.2": "2023-10-23T15:36:32.001Z",
@@ -2788,8 +2762,6 @@
       "id": "@tauri-apps/plugin-nfc",
       "name": "@tauri-apps/plugin-nfc",
       "versions": {
-        "created": "2023-12-20T03:33:22.688Z",
-        "modified": "2025-06-25T14:35:47.213Z",
         "2.0.0-alpha.0": "2023-12-20T03:33:22.962Z",
         "2.0.0-beta.0": "2024-02-03T22:21:33.440Z",
         "2.0.0-beta.1": "2024-02-21T19:45:32.856Z",
@@ -2842,8 +2814,6 @@
       "id": "@tauri-apps/plugin-notification",
       "name": "@tauri-apps/plugin-notification",
       "versions": {
-        "created": "2023-05-24T16:24:22.809Z",
-        "modified": "2025-06-25T14:35:59.900Z",
         "2.0.0-alpha.0": "2023-05-24T16:24:23.025Z",
         "2.0.0-alpha.1": "2023-08-14T21:30:51.440Z",
         "2.0.0-alpha.2": "2023-10-23T15:41:27.767Z",
@@ -2917,8 +2887,6 @@
       "id": "@tauri-apps/plugin-os",
       "name": "@tauri-apps/plugin-os",
       "versions": {
-        "created": "2023-05-24T16:28:16.091Z",
-        "modified": "2025-06-25T14:36:12.005Z",
         "2.0.0-alpha.0": "2023-05-24T16:28:16.281Z",
         "2.0.0-alpha.1": "2023-08-14T21:34:21.108Z",
         "2.0.0-alpha.2": "2023-08-15T14:04:10.693Z",
@@ -2983,8 +2951,6 @@
       "id": "@tauri-apps/plugin-positioner",
       "name": "@tauri-apps/plugin-positioner",
       "versions": {
-        "created": "2023-05-24T20:28:51.329Z",
-        "modified": "2025-06-25T14:36:29.363Z",
         "2.0.0-alpha.0": "2023-05-24T20:28:51.568Z",
         "2.0.0-alpha.1": "2023-08-14T21:41:17.408Z",
         "2.0.0-alpha.2": "2023-10-23T15:55:55.018Z",
@@ -3064,8 +3030,6 @@
       "id": "@tauri-apps/plugin-process",
       "name": "@tauri-apps/plugin-process",
       "versions": {
-        "created": "2023-05-24T20:32:27.548Z",
-        "modified": "2025-06-25T14:36:40.234Z",
         "2.0.0-alpha.0": "2023-05-24T20:32:27.871Z",
         "2.0.0-alpha.1": "2023-08-14T21:44:46.425Z",
         "2.0.0-alpha.2": "2023-10-23T16:00:57.153Z",
@@ -3129,8 +3093,6 @@
       "id": "@tauri-apps/plugin-shell",
       "name": "@tauri-apps/plugin-shell",
       "versions": {
-        "created": "2023-05-24T20:36:16.567Z",
-        "modified": "2025-06-25T14:36:52.505Z",
         "2.0.0-alpha.0": "2023-05-24T20:36:16.786Z",
         "2.0.0-alpha.1": "2023-08-14T21:48:27.747Z",
         "2.0.0-alpha.2": "2023-10-23T16:05:59.791Z",
@@ -3201,8 +3163,6 @@
       "id": "@tauri-apps/plugin-sql",
       "name": "@tauri-apps/plugin-sql",
       "versions": {
-        "created": "2023-05-24T21:22:10.763Z",
-        "modified": "2025-06-25T14:37:10.645Z",
         "2.0.0-alpha.0": "2023-05-24T21:22:10.995Z",
         "2.0.0-alpha.1": "2023-08-14T21:56:24.471Z",
         "2.0.0-alpha.2": "2023-10-23T16:16:45.450Z",
@@ -3272,8 +3232,6 @@
       "id": "@tauri-apps/plugin-store",
       "name": "@tauri-apps/plugin-store",
       "versions": {
-        "created": "2023-05-24T21:25:01.018Z",
-        "modified": "2025-06-25T14:37:23.882Z",
         "2.0.0-alpha.0": "2023-05-24T21:25:01.229Z",
         "2.0.0-alpha.1": "2023-08-14T22:00:00.150Z",
         "2.0.0-alpha.2": "2023-10-23T16:21:44.395Z",
@@ -3343,8 +3301,6 @@
       "id": "@tauri-apps/plugin-stronghold",
       "name": "@tauri-apps/plugin-stronghold",
       "versions": {
-        "created": "2023-05-24T21:28:56.877Z",
-        "modified": "2025-06-25T14:37:37.191Z",
         "2.0.0-alpha.0": "2023-05-24T21:28:57.077Z",
         "2.0.0-alpha.1": "2023-06-06T12:39:44.787Z",
         "2.0.0-alpha.2": "2023-08-14T22:11:49.749Z",
@@ -3407,8 +3363,6 @@
       "id": "@tauri-apps/plugin-updater",
       "name": "@tauri-apps/plugin-updater",
       "versions": {
-        "created": "2023-05-24T21:31:58.722Z",
-        "modified": "2025-06-25T14:37:49.371Z",
         "2.0.0-alpha.0": "2023-05-24T21:31:58.961Z",
         "2.0.0-alpha.1": "2023-08-14T22:16:02.211Z",
         "2.0.0-alpha.2": "2023-10-23T17:14:30.990Z",
@@ -3499,8 +3453,6 @@
       "id": "@tauri-apps/plugin-upload",
       "name": "@tauri-apps/plugin-upload",
       "versions": {
-        "created": "2023-05-24T21:34:51.196Z",
-        "modified": "2025-06-25T14:38:00.873Z",
         "2.0.0-alpha.0": "2023-05-24T21:34:51.402Z",
         "2.0.0-alpha.1": "2023-08-14T22:20:06.724Z",
         "2.0.0-alpha.2": "2023-10-23T17:17:32.391Z",
@@ -3569,8 +3521,6 @@
       "id": "@tauri-apps/plugin-websocket",
       "name": "@tauri-apps/plugin-websocket",
       "versions": {
-        "created": "2023-05-24T21:37:44.131Z",
-        "modified": "2025-06-25T14:38:12.680Z",
         "2.0.0-alpha.0": "2023-05-24T21:37:44.378Z",
         "2.0.0-alpha.1": "2023-08-14T22:24:00.828Z",
         "2.0.0-alpha.2": "2023-10-23T17:20:33.604Z",
@@ -3637,8 +3587,6 @@
       "id": "@tauri-apps/plugin-window-state",
       "name": "@tauri-apps/plugin-window-state",
       "versions": {
-        "created": "2023-05-24T21:43:38.337Z",
-        "modified": "2025-06-25T14:38:25.141Z",
         "2.0.0-alpha.0": "2023-05-24T21:43:38.553Z",
         "2.0.0-alpha.1": "2023-08-14T22:31:47.560Z",
         "2.0.0-alpha.2": "2023-10-23T17:23:38.374Z",

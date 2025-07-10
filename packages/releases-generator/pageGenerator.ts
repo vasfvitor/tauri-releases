@@ -2,8 +2,8 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { baseDir, note } from "./config";
 import { entitify } from "./utils";
-import type { PackageData } from "./dataFetch";
 import { rcompare } from "semver";
+import type { PackageData } from "./types";
 
 /**
  * Parse changelog content into individual releases
@@ -51,6 +51,7 @@ function generateVersionPage(
 	const pageFrontmatter = [
 		note,
 		`title: '${packageName}@${version}'`,
+		`sidebar: '${version}'`,
 		`description: '${version}'`,
 		`order: ${order}`,
 	];
@@ -58,7 +59,9 @@ function generateVersionPage(
 	const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
 	const header = `<ReleaseHeader href="${tag}/${packageName}-v${version}" />`;
 
-	const content = `${frontmatter}\n\n${header}\n${notes}`;
+	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
+
+	const content = `${frontmatter}\n\n${header}\n\n${tags}\n\n${notes}`;
 	const fileName = `v${version}.md`;
 
 	writeFileSync(join(workingDir, fileName), content);
@@ -75,13 +78,15 @@ function generateAllVersionsPage(
 ): void {
 	const frontmatter = [
 		note,
-		`title: '${packageName} - All Releases'`,
+		`title: '${packageName} - full changelog'`,
+		`sidebar: 'Full Changelog'`,
 		`description: 'All changelog entries for ${packageName}'`,
 		"order: 0",
 	];
 	const header = `<ReleaseHeader href="${url}" />`;
+	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
 
-	const fileContent = `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n${content}`;
+	const fileContent = `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n\n${tags}${content}`;
 	writeFileSync(join(workingDir, "all_versions.md"), fileContent);
 }
 
@@ -124,8 +129,9 @@ export function generatePages(
 	const packageNames: string[] = [];
 
 	Object.entries(packageData).forEach(([packageName, data]) => {
-		packageNames.push(packageName);
-		const workingDir = join(outputDir, data.group || "", packageName);
+		const fullName = `${data.group || ""}/${packageName}`;
+		packageNames.push(fullName);
+		const workingDir = join(outputDir, fullName);
 		mkdirSync(workingDir, { recursive: true });
 
 		if (!data.changelogs) {
@@ -139,16 +145,16 @@ export function generatePages(
 		}
 
 		releases.sort((a, b) => {
-			return rcompare(a.version, b.version);
+			return rcompare(b.version, a.version);
 		});
 
-		let allContent = "";
+		const allContent: string[] = [];
 
 		releases.forEach((release, i) => {
 			const { version, notes } = release;
 			const processedNotes = entitify(notes);
 
-			allContent += `\n\n## v${version}\n\n${processedNotes}`;
+			allContent.unshift(`\n\n## v${version}\n\n${processedNotes}`);
 
 			generateVersionPage(
 				packageName,
@@ -162,7 +168,7 @@ export function generatePages(
 
 		generateAllVersionsPage(
 			packageName,
-			allContent,
+			allContent.join(""),
 			data.npmData?.name || data.cratesData?.name || packageName,
 			workingDir,
 		);

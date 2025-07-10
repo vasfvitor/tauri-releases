@@ -13,6 +13,8 @@ const vitepressSidebarOptions: VitePressSidebarOptions = {
 	collapseDepth: 1,
 	documentRootPath: srcDir,
 	sortMenusByFrontmatterOrder: true,
+	useTitleFromFrontmatter: true,
+	frontmatterTitleFieldName: "sidebar",
 };
 
 // https://vitepress.dev/reference/site-config

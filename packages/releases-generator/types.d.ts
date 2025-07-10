@@ -53,9 +53,18 @@ export interface PackageData {
 }
 
 export interface TablePackageData {
-	packageName: string;
+	name: string;
 	group?: string;
 	changelogs: RawMarkdown;
 	npmData: NpmData;
 	cratesData: CratesData;
+}
+
+export interface PackageList {
+	[key: string]: string[];
+}
+
+export interface RepoData {
+	packageList: PackageList;
+	repoList: string[];
 }
