@@ -40,14 +40,16 @@ function parseChangelog(
 /**
  * Generate an individual page for each version
  */
-function generateVersionPage(
-	packageName: string,
-	version: string,
-	notes: string,
-	tag: string,
-	workingDir: string,
-	order: number,
-): void {
+function generateVersionPage(params: {
+	packageName: string;
+	version: string;
+	notes: string;
+	// todo: fix tag url
+	tag: string;
+	workingDir: string;
+	order: number;
+}): void {
+	const { packageName, version, notes, tag, workingDir, order } = params;
 	const pageFrontmatter = [
 		note,
 		`title: '${packageName}@${version}'`,
@@ -67,15 +69,13 @@ function generateVersionPage(
 	writeFileSync(join(workingDir, fileName), content);
 }
 
-/**
- * Generate a page containing all versions
- */
-function generateAllVersionsPage(
-	packageName: string,
-	content: string,
-	url: string,
-	workingDir: string,
-): void {
+function generateAllVersionsPage(params: {
+	packageName: string;
+	content: string;
+	url: string;
+	workingDir: string;
+}): void {
+	const { packageName, content, url, workingDir } = params;
 	const frontmatter = [
 		note,
 		`title: '${packageName} - full changelog'`,
@@ -83,6 +83,8 @@ function generateAllVersionsPage(
 		`description: 'All changelog entries for ${packageName}'`,
 		"order: 0",
 	];
+
+	// todo: fix tag url - should point either to the current release or the full changelog if the all version page
 	const header = `<ReleaseHeader href="${url}" />`;
 	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
 
@@ -156,22 +158,24 @@ export function generatePages(
 
 			allContent.unshift(`\n\n## v${version}\n\n${processedNotes}`);
 
-			generateVersionPage(
+			generateVersionPage({
 				packageName,
 				version,
-				processedNotes,
-				data.npmData?.name || data.cratesData?.name || packageName,
+				notes: processedNotes,
+				// todo: fix tag url - should point either to the current release or the full changelog if the all version page
+				tag: data.npmData?.name || data.cratesData?.name || packageName,
 				workingDir,
-				releases.length - i,
-			);
+				order: releases.length - i,
+			});
 		});
 
-		generateAllVersionsPage(
+		generateAllVersionsPage({
 			packageName,
-			allContent.join(""),
-			data.npmData?.name || data.cratesData?.name || packageName,
+			content: allContent.join(""),
+			// todo: fix tag url -
+			url: data.npmData?.name || data.cratesData?.name || packageName,
 			workingDir,
-		);
+		});
 	});
 
 	generateIndexPage(packageNames);

@@ -68,3 +68,10 @@ export interface RepoData {
 	packageList: PackageList;
 	repoList: string[];
 }
+
+export interface FlattenedPackageData {
+	name: string;
+	group?: string;
+	version: string;
+	releaseDate?: string;
+}
