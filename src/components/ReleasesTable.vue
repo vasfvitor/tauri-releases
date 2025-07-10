@@ -26,60 +26,45 @@ const repoData: RepoData = {
 };
 
 const columnHelper = createColumnHelper<TablePackageData>();
+
+function getLatestVersion(data: TablePackageData): [string, string] {
+    const npmVersions = data.npmData?.versions || {};
+    const cratesVersions = data.cratesData?.versions || {};
+
+    const allVersions = [
+        ...Object.entries(npmVersions),
+        ...Object.entries(cratesVersions)
+    ].filter(([, date]) => date != null) as [string, string][];
+
+    if (allVersions.length === 0) return ['', ''];
+
+    return allVersions.sort(([, dateA], [, dateB]) =>
+        new Date(dateB).getTime() - new Date(dateA).getTime()
+    )[0];
+}
+
 const columns = [
-    columnHelper.group({
-        header: 'Package Details',
-        columns: [
-            columnHelper.accessor(row => (row.group ? `${row.group}/${row.name}` : row.name), {
-                id: 'repoPkg',
-                cell: info => info.getValue(),
-                header: () => 'Repository/Package',
-                filterFn: 'includesString',
-            }),
-        ],
+    columnHelper.accessor(row => (row.group ? `${row.group}/${row.name}` : row.name), {
+        id: 'repoPkg',
+        header: 'Repository/Package',
+        cell: info => info.getValue(),
+        filterFn: 'includesString',
     }),
-    columnHelper.group({
-        header: 'Version Info',
-        columns: [
-            columnHelper.accessor('npmData.versions', {
-                header: () => 'Latest NPM Versions',
-                cell: info => {
-                    const versions: Record<string, string> = info.getValue();
-                    if (!versions) return '';
-                    const sortedVersions = Object.entries(versions)
-                        .sort(([, dateA], [, dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime());
-                    return h(
-                        'ul',
-                        { class: 'version-list' },
-                        sortedVersions.map(([version, date]) =>
-                            h('li', { class: 'version-item' }, [
-                                h('span', { class: 'version-number' }, version),
-                                h('span', { class: 'version-date' }, formatDate(date))
-                            ])
-                        )
-                    );
-                },
-            }),
-            columnHelper.accessor('cratesData.versions', {
-                header: () => 'Latest Crates Versions',
-                cell: info => {
-                    const versions: Record<string, string> = info.getValue();
-                    if (!versions) return '';
-                    const sortedVersions = Object.entries(versions)
-                        .sort(([, dateA], [, dateB]) => new Date(dateB).getTime() - new Date(dateA).getTime());
-                    return h(
-                        'ul',
-                        { class: 'version-list' },
-                        sortedVersions.map(([version, date]) =>
-                            h('li', { class: 'version-item' }, [
-                                h('span', { class: 'version-number' }, version),
-                                h('span', { class: 'version-date' }, formatDate(date))
-                            ])
-                        )
-                    );
-                },
-            }),
-        ],
+    columnHelper.accessor(row => getLatestVersion(row)[0], {
+        id: 'version',
+        header: 'Latest Version',
+        cell: info => {
+            const version = info.getValue();
+            return version ? h('span', { class: 'version-number' }, version) : '';
+        },
+    }),
+    columnHelper.accessor(row => getLatestVersion(row)[1], {
+        id: 'date',
+        header: 'Release Date',
+        cell: info => {
+            const date = info.getValue();
+            return date ? h('span', { class: 'version-date' }, formatDate(date)) : '';
+        },
     }),
 ];
 
@@ -181,83 +166,3 @@ export default {
         </div>
     </div>
 </template>
-
-<style scoped>
-/* .releases-table {
-    padding: 1rem;
-}
-
-.filters {
-    margin-bottom: 1.5rem;
-}
-
-.filter-group {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.filter-label {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.filter-select {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: white;
-    min-width: 200px;
-}
-
-.table-container {
-    overflow-x: auto;
-}
-
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-.table-header {
-    background: #f5f5f5;
-    padding: 1rem;
-    text-align: left;
-    font-weight: 600;
-    border-bottom: 2px solid #ddd;
-}
-
-.table-cell {
-    padding: 1rem;
-    border-bottom: 1px solid #eee;
-}
-
-.table-row:hover {
-    background: #f8f8f8;
-}
-
-.version-list {
-    padding: 0;
-    margin: 0;
-}
-
-.version-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.25rem 0;
-    gap: 1rem;
-}
-
-.version-number {
-    font-weight: 500;
-    color: #2563eb;
-}
-
-.version-date {
-    color: #666;
-    font-size: 0.9em;
-} */
-</style>
