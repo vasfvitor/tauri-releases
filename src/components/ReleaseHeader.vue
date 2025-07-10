@@ -5,7 +5,7 @@
         </span>
         <!-- TODO: fix -->
         <!-- <span>
-             format: https://github.com/tauri-apps/tauri/releases/tag/tauri-v2.6.1 for each version - or CHANGELOG.MD for the full changelog
+             format: https://github.com/tauri-apps/tauri/releases/tag/tauri-v2.6.1 for each version - or CHANGELOG.MD for the full changelog page
             <a :href="href" target="_blank" rel="noopener">View on GitHub</a>
         </span> -->
     </div>

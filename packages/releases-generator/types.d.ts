@@ -43,6 +43,7 @@ export interface CratesData {
 // CHANGELOG.MD file with all versions
 export type RawMarkdown = string;
 
+// repo and group are the same thing - or should be
 export interface PackageData {
 	[packageName: string]: {
 		group?: string;
@@ -52,12 +53,17 @@ export interface PackageData {
 	};
 }
 
-export interface TablePackageData {
+export interface TableData {
 	name: string;
-	group?: string;
-	changelogs: RawMarkdown;
-	npmData: NpmData;
-	cratesData: CratesData;
+	repo: string;
+	version: string;
+	changelog: RawMarkdown;
+	date: string | "-";
+}
+
+export interface TableMetadata {
+	packages: Record<string, []>;
+	repoList: Array<string>;
 }
 
 export interface PackageList {

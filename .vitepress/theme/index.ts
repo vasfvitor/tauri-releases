@@ -11,8 +11,8 @@ import ReleasesTable from "../../src/components/ReleasesTable.vue";
 
 const vuetify = createVuetify({ components, directives });
 
-import "./styles/theme.css";
-import "./styles/custom.css";
+// import "./styles/theme.css";
+// import "./styles/custom.css";
 import "vuetify/styles";
 
 export default {

@@ -29,5 +29,5 @@ export function writeOutput(output: string | unknown, fileName: string): void {
 
 	writeFileSync(filePath, JSON.stringify(output, null, 2), "utf-8");
 
-	console.log(`done: ${filePath}`);
+	console.log(`generated: ${filePath}`);
 }

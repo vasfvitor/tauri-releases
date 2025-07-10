@@ -1,9 +1,9 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { baseDir, note } from "./config";
-import { entitify } from "./utils";
+import { entitify, writeOutput } from "./utils";
 import { rcompare } from "semver";
-import type { PackageData } from "./types";
+import type { PackageData, TableData, TableMetadata } from "./types";
 
 /**
  * Parse changelog content into individual releases
@@ -124,15 +124,34 @@ function generateIndexPage(packages: string[]): void {
 /**
  * Main function to generate all frontend pages from PackageData
  */
-export function generatePages(
+export function generatePagesAndTableData(
 	packageData: PackageData,
 	outputDir: string = baseDir,
 ): void {
 	const packageNames: string[] = [];
+	const tableRows: TableData[] = [];
+	const tableMetadata: TableMetadata = {
+		packages: {},
+		repoList: [],
+	};
+	const repoList = new Set<string>();
 
 	Object.entries(packageData).forEach(([packageName, data]) => {
+		// table stuff
+		const key = data.group || packageName;
+		if (!tableMetadata.packages[key]) {
+			tableMetadata.packages[key] = [];
+		}
+		// @ts-expect-error
+		tableMetadata.packages[key].push(packageName);
+		const repo = data.group || packageName;
+		repoList.add(repo);
+		//
+
 		const fullName = `${data.group || ""}/${packageName}`;
+
 		packageNames.push(fullName);
+
 		const workingDir = join(outputDir, fullName);
 		mkdirSync(workingDir, { recursive: true });
 
@@ -154,6 +173,7 @@ export function generatePages(
 
 		releases.forEach((release, i) => {
 			const { version, notes } = release;
+			const { npmData, cratesData } = data;
 			const processedNotes = entitify(notes);
 
 			allContent.unshift(`\n\n## v${version}\n\n${processedNotes}`);
@@ -163,24 +183,73 @@ export function generatePages(
 				version,
 				notes: processedNotes,
 				// todo: fix tag url - should point either to the current release or the full changelog if the all version page
-				tag: data.npmData?.name || data.cratesData?.name || packageName,
+				tag: packageName,
 				workingDir,
 				order: releases.length - i,
 			});
+
+			// table stuff
+			let date: string | undefined;
+			if (npmData?.versions?.[version]) {
+				date = data.npmData.versions[version];
+			}
+			if (!date && cratesData?.versions?.[version]) {
+				date = data.cratesData.versions[version];
+			}
+
+			tableRows.push(
+				generateTableRow({
+					packageName,
+					version,
+					date,
+					changelog: processedNotes,
+					repo,
+				}),
+			);
+			//
 		});
 
 		generateAllVersionsPage({
 			packageName,
 			content: allContent.join(""),
 			// todo: fix tag url -
-			url: data.npmData?.name || data.cratesData?.name || packageName,
+			url: data.npmData?.name || data.cratesData?.name,
 			workingDir,
 		});
 	});
 
 	generateIndexPage(packageNames);
 
+	// table stuff
+	tableMetadata.repoList = Array.from(repoList);
+	generateTableData(tableRows, tableMetadata);
+	//
+
 	console.log(
 		`Generated pages for ${packageNames.length} packages in ${outputDir}`,
 	);
+}
+
+function generateTableRow(params: {
+	packageName: string;
+	repo: string;
+	version: string;
+	changelog: string;
+	date: string | undefined;
+}): TableData {
+	const { packageName, version, date, changelog, repo } = params;
+	return {
+		name: packageName,
+		repo,
+		version,
+		changelog,
+		date: date || "-",
+	};
+}
+
+function generateTableData(
+	tableData: TableData[],
+	tableMetadata: TableMetadata,
+): void {
+	writeOutput({ tableMetadata, tableData }, "tableData.json");
 }
