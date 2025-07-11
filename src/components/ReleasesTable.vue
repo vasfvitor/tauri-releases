@@ -12,22 +12,33 @@ import { ref, watch, computed } from 'vue';
 
 import sourceData from '../../packages/releases-generator/generated/tableData.json';
 import type { TableData } from '../../packages/releases-generator/types';
+import { parseISO, format, isBefore, subMonths } from 'date-fns';
 
 function formatDate(val) {
     if (!val || val === "-") return '-';
-    const date = new Date(val);
-    return date.toISOString().split("T")[0];
+    const date = parseISO(val);
+    return format(date, "yyyy-MM-dd");
+
 }
 
 const dateInRange = (row, columnId, filterValue) => {
-    const value = new Date(row.getValue(columnId));
-    const from = filterValue?.from ? new Date(filterValue.from) : null;
-    const to = filterValue?.to ? new Date(filterValue.to) : null;
+    if (!filterValue) {
+        return true;
+    }
+    const cellValue = row.getValue(columnId);
+    if (!cellValue || cellValue === "-") {
+        return false;
+    }
+    const value = parseISO(cellValue);
+    const since = parseISO(filterValue);
 
-    if (from && value < from) return false;
-    if (to && value > to) return false;
+    if (isBefore(value, since)) {
+        return false;
+    }
+
     return true;
 };
+
 
 const strictIncludes = (row, columnId, filterValues: string[]) => {
     const cellValue = row.getValue(columnId);
@@ -38,7 +49,9 @@ const strictIncludes = (row, columnId, filterValues: string[]) => {
 const { repoList, packages } = sourceData.tableMetadata
 
 const data = ref<TableData[]>(sourceData.tableData);
-const dateRange = ref<{ from: string | null, to: string | null }>({ from: null, to: null });
+
+const lastMonth = subMonths(new Date(), 1);
+const filterDate = ref<string | null>(lastMonth.toISOString().split('T')[0]);
 
 const columnFilters = ref<ColumnFiltersState>([]);
 
@@ -108,9 +121,8 @@ watch(selectedProjects, (newProjects) => {
         col.setFilterValue(newProjects.length ? newProjects : undefined);
     }
 });
-watch(dateRange, (range) => {
-
-    table.getColumn('date')?.setFilterValue(range);
+watch(filterDate, (since) => {
+    table.getColumn('date')?.setFilterValue(since);
 }, { immediate: true });
 
 
@@ -134,11 +146,9 @@ watch(dateRange, (range) => {
     </v-row>
     <v-row>
         <v-col>
-            <v-text-field type="date" v-model="dateRange.from" label="From" />
+            <v-text-field type="date" v-model="filterDate" label="Since" />
         </v-col>
-        <v-col>
-            <v-text-field type="date" v-model="dateRange.to" label="To" />
-        </v-col>
+
     </v-row>
 
 
