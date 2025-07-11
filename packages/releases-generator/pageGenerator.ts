@@ -10,33 +10,21 @@ import {
 } from "./scripts/generatePage";
 import { parseAndSortChangelog } from "./scripts/parse";
 
-/**
- * Main function to generate all frontend pages from PackageData
- */
 export function generatePagesAndTableData(
+	packageData: PackageData,
+	outputDir: string = baseDir,
+) {
+	writeTableData(packageData, outputDir);
+	writePageData(packageData, outputDir);
+}
+
+export function writePageData(
 	packageData: PackageData,
 	outputDir: string = baseDir,
 ): void {
 	const packageNames: string[] = [];
-	const tableRows: TableData[] = [];
-	const tableMetadata: TableMetadata = {
-		packages: {},
-		repoList: [],
-	};
-	const repoList = new Set<string>();
 
 	Object.entries(packageData).forEach(([packageName, data]) => {
-		// table stuff
-		const key = data.group || packageName;
-		if (!tableMetadata.packages[key]) {
-			tableMetadata.packages[key] = [];
-		}
-		// @ts-expect-error
-		tableMetadata.packages[key].push(packageName);
-		const repo = data.group || packageName;
-		repoList.add(repo);
-		//
-
 		const fullName = `${data.group || ""}/${packageName}`;
 
 		packageNames.push(fullName);
@@ -46,20 +34,17 @@ export function generatePagesAndTableData(
 
 		if (!data.changelogs) {
 			console.warn(`missing changelog ${packageName}`);
-			return;
 		}
 		const releases = parseAndSortChangelog(data.changelogs);
 		if (releases.length === 0) {
 			console.warn(`missing releases ${packageName}`);
-			return [];
 		}
 
 		const allContent: string[] = [];
 
 		releases.forEach((release, i) => {
 			const { version, notes } = release;
-			const { npmData, cratesData } = data;
-			const { rawMd, parsedMd } = parseMarkdown(notes);
+			const { rawMd } = parseMarkdown(notes);
 
 			allContent.unshift(`\n\n## v${version}\n\n${rawMd}`);
 
@@ -72,8 +57,63 @@ export function generatePagesAndTableData(
 				workingDir,
 				order: releases.length - i,
 			});
+		});
 
-			// table stuff
+		generateAllVersionsPage({
+			packageName,
+			content: allContent.join(""),
+			// todo: fix tag url -
+			url: data.npmData?.name || data.cratesData?.name,
+			workingDir,
+		});
+	});
+
+	generateIndexPage(packageNames);
+
+	console.log(
+		`Generated pages for ${packageNames.length} packages in ${outputDir}`,
+	);
+}
+
+export function writeTableData(
+	packageData: PackageData,
+	outputDir: string = baseDir,
+): void {
+	const tableRows: TableData[] = [];
+	const tableMetadata: TableMetadata = {
+		packages: {},
+		repoList: [],
+	};
+	const repoList = new Set<string>();
+
+	Object.entries(packageData).forEach(([packageName, data]) => {
+		const key = data.group || packageName;
+		if (!tableMetadata.packages[key]) {
+			tableMetadata.packages[key] = [];
+		}
+		// @ts-expect-error
+		tableMetadata.packages[key].push(packageName);
+		const repo = data.group || packageName;
+		repoList.add(repo);
+
+		const fullName = `${data.group || ""}/${packageName}`;
+
+		const workingDir = join(outputDir, fullName);
+		mkdirSync(workingDir, { recursive: true });
+
+		if (!data.changelogs) {
+			console.warn(`missing changelog ${packageName}`);
+		}
+		const releases = parseAndSortChangelog(data.changelogs);
+		if (releases.length === 0) {
+			console.warn(`missing releases ${packageName}`);
+		}
+
+		releases.forEach((release) => {
+			const { version, notes } = release;
+			const { npmData, cratesData } = data;
+			const { parsedMd } = parseMarkdown(notes);
+
 			let date: string | undefined;
 			if (npmData?.versions?.[version]) {
 				date = data.npmData.versions[version];
@@ -91,29 +131,13 @@ export function generatePagesAndTableData(
 			});
 			//
 		});
-
-		generateAllVersionsPage({
-			packageName,
-			content: allContent.join(""),
-			// todo: fix tag url -
-			url: data.npmData?.name || data.cratesData?.name,
-			workingDir,
-		});
 	});
 
-	generateIndexPage(packageNames);
-
-	// table stuff
 	tableMetadata.repoList = Array.from(repoList);
 	const tableData: { tableData: TableData[]; tableMetadata: TableMetadata } = {
+		tableMetadata,
 		// reverse to order versions
 		tableData: tableRows.reverse(),
-		tableMetadata,
 	};
 	writeOutput(tableData, "tableData.json");
-	//
-
-	console.log(
-		`Generated pages for ${packageNames.length} packages in ${outputDir}`,
-	);
 }
