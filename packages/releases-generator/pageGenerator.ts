@@ -3,7 +3,13 @@ import { join } from "node:path";
 import { baseDir, note } from "./config";
 import { entitify, writeOutput } from "./utils";
 import { rcompare } from "semver";
-import type { PackageData, TableData, TableMetadata } from "./types";
+import type {
+	PackageData,
+	ProjectData,
+	TableData,
+	TableMetadata,
+	VersionData,
+} from "./types";
 
 /**
  * Parse changelog content into individual releases
@@ -107,7 +113,6 @@ function generateIndexPage(packages: string[]): void {
 	const indexPage = [
 		"---",
 		note,
-		`layout: home`,
 		`title: 'Tauri Releases'`,
 		"---",
 		"",
@@ -131,23 +136,25 @@ export function generatePagesAndTableData(
 	outputDir: string = baseDir,
 ): void {
 	const packageNames: string[] = [];
-	const tableRows: TableData[] = [];
 	const tableMetadata: TableMetadata = {
 		packages: {},
 		repoList: [],
 	};
+	const tableRows: TableData[] = [];
+
 	const repoList = new Set<string>();
 
 	Object.entries(packageData).forEach(([packageName, data]) => {
 		// table stuff
+		const versionsData: VersionData[] = [];
+		const projectsData: ProjectData[] = [];
 		const key = data.group || packageName;
 		if (!tableMetadata.packages[key]) {
 			tableMetadata.packages[key] = [];
 		}
 		// @ts-expect-error
 		tableMetadata.packages[key].push(packageName);
-		const repo = data.group || packageName;
-		repoList.add(repo);
+
 		//
 
 		const fullName = `${data.group || ""}/${packageName}`;
@@ -173,6 +180,7 @@ export function generatePagesAndTableData(
 
 		const allContent: string[] = [];
 
+		// loop 2
 		releases.forEach((release, i) => {
 			const { version, notes } = release;
 			const { npmData, cratesData } = data;
@@ -198,18 +206,35 @@ export function generatePagesAndTableData(
 			if (!date && cratesData?.versions?.[version]) {
 				date = data.cratesData.versions[version];
 			}
+			if (!date) {
+				console.log(`No date for ${packageName} v${version}`);
+			}
 
-			tableRows.push(
-				generateTableRow({
-					packageName,
-					version,
-					date,
-					changelog: processedNotes,
-					repo,
-				}),
-			);
+			versionsData.push({
+				version,
+				changelog: processedNotes,
+				date: date || "-",
+			});
+
 			//
 		});
+
+		// main loop
+
+		projectsData.push({ name: packageName, versions: versionsData });
+		const repo = data.group || packageName;
+		repoList.add(repo);
+
+		const existingRepo = tableRows.find((r) => r.repo === repo);
+
+		if (existingRepo) {
+			existingRepo.projects.push({ name: packageName, versions: versionsData });
+		} else {
+			tableRows.push({
+				repo,
+				projects: [{ name: packageName, versions: versionsData }],
+			});
+		}
 
 		generateAllVersionsPage({
 			packageName,
@@ -230,23 +255,6 @@ export function generatePagesAndTableData(
 	console.log(
 		`Generated pages for ${packageNames.length} packages in ${outputDir}`,
 	);
-}
-
-function generateTableRow(params: {
-	packageName: string;
-	repo: string;
-	version: string;
-	changelog: string;
-	date: string | undefined;
-}): TableData {
-	const { packageName, version, date, changelog, repo } = params;
-	return {
-		name: packageName,
-		repo,
-		version,
-		changelog,
-		date: date || "-",
-	};
 }
 
 function generateTableData(

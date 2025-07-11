@@ -7,8 +7,9 @@ import {
     type ColumnFiltersState,
     type ColumnDef,
     FlexRender,
+    getExpandedRowModel,
 } from '@tanstack/vue-table';
-import { ref, watch, computed, h } from 'vue';
+import { ref, watch, computed, h, reactive } from 'vue';
 
 import sourceData from '../../packages/releases-generator/generated/tableData.json';
 import type { TableData } from '../../packages/releases-generator/types';
@@ -48,64 +49,83 @@ const strictIncludes = (row, columnId, filterValues: string[]) => {
 
 const { repoList, packages } = sourceData.tableMetadata
 
+
 const data = ref<TableData[]>(sourceData.tableData);
 
 const lastMonth = subMonths(new Date(), 1);
 const filterDate = ref<string | null>(lastMonth.toISOString().split('T')[0]);
 
-const columnFilters = ref<ColumnFiltersState>([]);
+const expandedProjects = reactive(new Set<string>());
+const toggleProjectExpanded = (projectName: string) => {
+    if (expandedProjects.has(projectName)) {
+        expandedProjects.delete(projectName);
+    } else {
+        expandedProjects.add(projectName);
+    }
+};
 
+const columnFilters = ref<ColumnFiltersState>([]);
 
 const columnHelper = createColumnHelper<TableData>();
 const columns: ColumnDef<TableData, string>[] = [
+
+    columnHelper.display({
+        id: 'expander',
+        header: '',
+        cell: ({ row }) => h('button', {
+            onClick: () => row.toggleExpanded(),
+            style: 'cursor: pointer; background: none; border: none; font-size: 16px;',
+        }, row.getIsExpanded() ? '▲' : '▼'),
+    }),
+
     columnHelper.accessor('repo', {
         header: 'Repository',
         filterFn: 'equals',
     }),
 
-    columnHelper.accessor('name', {
-        header: 'Package',
-        filterFn: strictIncludes,
-    }),
+    // columnHelper.accessor('name', {
+    //     header: 'Package',
+    //     filterFn: strictIncludes,
+    // }),
 
-    columnHelper.accessor('version', { header: 'Version' }),
+    // columnHelper.accessor('version', { header: 'Version' }),
 
-    columnHelper.accessor('date', {
-        header: 'Release Date',
-        cell: info => formatDate(info.getValue()),
-        enableColumnFilter: true,
-        filterFn: dateInRange,
-    }),
+    // columnHelper.accessor('date', {
+    //     header: 'Release Date',
+    //     cell: info => formatDate(info.getValue()),
+    //     enableColumnFilter: true,
+    //     filterFn: dateInRange,
+    // }),
 
-    columnHelper.accessor('changelog', {
-        header: 'Changelog',
-        cell: info => {
-            const changelogContent = info.getValue();
-            return h('a', {
-                href: '#',
-                // todo: render markdown
-                onClick: (event) => {
-                    event.preventDefault();
-                    showChangelogPopup(changelogContent);
-                },
-            }, 'expand');
-        },
+    // columnHelper.accessor('changelog', {
+    //     header: 'Changelog',
+    //     cell: info => {
+    //         const changelogContent = info.getValue();
+    //         return h('a', {
+    //             href: '#',
+    //             // todo: render markdown
+    //             onClick: (event) => {
+    //                 event.preventDefault();
+    //                 showChangelogPopup(changelogContent);
+    //             },
+    //         }, 'expand');
+    //     },
 
-    }),
-    columnHelper.display({
-        id: 'link',
-        header: 'Link',
-        cell: info => {
-            const { repo, name, version } = info.row.original;
-            const isRoot = repo === name && repo !== 'tauri'
-            const path = isRoot ? repo : `${repo}/${name}`;
+    // }),
+    // columnHelper.display({
+    //     id: 'link',
+    //     header: 'Link',
+    //     cell: info => {
+    //         const { repo, name, version } = info.row.original;
+    //         const isRoot = repo === name && repo !== 'tauri'
+    //         const path = isRoot ? repo : `${repo}/${name}`;
 
-            // link to github?
-            return h('a', {
-                href: `/${path}/v${version}`
-            }, 'Link');
-        },
-    })
+    //         // link to github?
+    //         return h('a', {
+    //             href: `/${path}/v${version}`
+    //         }, 'Link');
+    //     },
+    // }),
 
 
 ];
@@ -128,6 +148,10 @@ const table = useVueTable({
     },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getRowCanExpand: (row) => {
+        return true
+    }
 });
 
 
@@ -151,15 +175,12 @@ watch(selectedProjects, (newProjects) => {
         col.setFilterValue(newProjects.length ? newProjects : undefined);
     }
 });
-watch(filterDate, (since) => {
-    table.getColumn('date')?.setFilterValue(since);
-}, { immediate: true });
+// watch(filterDate, (since) => {
+//     table.getColumn('date')?.setFilterValue(since);
+// }, { immediate: true });
 
 
 const showChangelog = ref<string | null>(null);
-const showChangelogPopup = (content: string) => {
-    showChangelog.value = content;
-};
 const closeChangelog = () => {
     showChangelog.value = null;
 };
@@ -194,7 +215,7 @@ watch(isChangelogVisible, (visible) => {
     </v-row>
 
 
-    <v-table class="mt-4">
+    <v-table density="compact" class="mt-4">
         <thead>
             <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
                 <th v-for="header in headerGroup.headers" :key="header.id" :colspan="header.colSpan">
@@ -204,11 +225,68 @@ watch(isChangelogVisible, (visible) => {
             </tr>
         </thead>
         <tbody>
-            <tr v-for="row in table.getRowModel().rows" :key="row.id">
-                <td v-for="cell in row.getVisibleCells()" :key="cell.id">
-                    <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
-                </td>
-            </tr>
+            <template v-for="row in table.getRowModel().rows" :key="row.id">
+                <tr>
+                    <td v-for="cell in row.getVisibleCells()" :key="cell.id">
+                        <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                    </td>
+                </tr>
+                <tr v-if="row.getIsExpanded()">
+                    <td :colspan="row.getAllCells().length">
+                        <div>
+                            <table style="width: 100%">
+                                <tbody>
+                                    <template v-for="project in row.original.projects" :key="project.name">
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    <button @click="toggleProjectExpanded(project.name)">
+                                                        {{ expandedProjects.has(project.name) ? '▼' : '▲' }}
+                                                    </button>
+                                                    <span>{{ project.name }}</span>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                Latest: {{ formatDate(project.versions[0]?.date || '-') }}
+                                            </td>
+                                        </tr>
+                                        <tr v-if="expandedProjects.has(project.name)">
+                                            <td colspan="3">
+                                                <div class="versions-container px-4 py-2">
+                                                    <table style="width: 100%">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Version</th>
+                                                                <th>Date</th>
+                                                                <th>Changelog</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="version in project.versions"
+                                                                :key="version.version">
+                                                                <td>{{ version.version }}</td>
+                                                                <td>{{ formatDate(version.date) }}</td>
+                                                                <td>
+                                                                    <a href="#"
+                                                                        @click.prevent="showChangelog = version.changelog">
+                                                                        View
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+
+            </template>
         </tbody>
     </v-table>
 

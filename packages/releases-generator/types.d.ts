@@ -53,12 +53,20 @@ export interface PackageData {
 	};
 }
 
-export interface TableData {
-	name: string;
-	repo: string;
+export interface VersionData {
 	version: string;
 	changelog: RawMarkdown;
 	date: string | "-";
+}
+
+export interface ProjectData {
+	name: string;
+	versions: VersionData[];
+}
+
+export interface TableData {
+	repo: string;
+	projects: ProjectData[];
 }
 
 export interface TableMetadata {
