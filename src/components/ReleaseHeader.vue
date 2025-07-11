@@ -1,14 +1,16 @@
 <template>
     <div class="links-div">
         <span>
-            <a href="/">Return</a>
+            <a href="/">Home</a>
         </span>
-        <span>
+        <!-- TODO: fix -->
+        <!-- <span>
+             format: https://github.com/tauri-apps/tauri/releases/tag/tauri-v2.6.1 for each version - or CHANGELOG.MD for the full changelog page
             <a :href="href" target="_blank" rel="noopener">View on GitHub</a>
-        </span>
+        </span> -->
     </div>
 </template>
-<!-- : script setup lang="ts"> -->
+
 <script>
 export default {
     name: 'ReleaseHeader',

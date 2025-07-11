@@ -1,0 +1,92 @@
+import { mkdirSync, writeFileSync } from "node:fs";
+import { baseDir, note, repositories } from "../config";
+import { join } from "node:path";
+import { getSummaryTable } from "./summary";
+
+/**
+ * write an individual page for each version
+ */
+export function writeVersionPage(params: {
+	packageName: string;
+	version: string;
+	notes: string;
+	// todo: fix tag url
+	tag: string;
+	workingDir: string;
+	order: number;
+}): void {
+	const { packageName, version, notes, tag, workingDir, order } = params;
+	const pageFrontmatter = [
+		note,
+		`title: '${packageName}@${version}'`,
+		`sidebar: '${version}'`,
+		`description: '${version}'`,
+		`order: ${order}`,
+	];
+
+	const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
+	const header = `<ReleaseHeader href="${tag}/${packageName}-v${version}" />`;
+
+	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
+
+	const content = `${frontmatter}\n\n${header}\n\n${tags}\n\n${notes}`;
+	const fileName = `v${version}.md`;
+
+	writeFileSync(join(workingDir, fileName), content);
+}
+
+export function writeAllVersionsPage(params: {
+	packageName: string;
+	content: string;
+	url: string;
+	workingDir: string;
+}): void {
+	const { packageName, content, url, workingDir } = params;
+	const frontmatter = [
+		note,
+		`title: '${packageName} - full changelog'`,
+		`sidebar: 'Full Changelog'`,
+		`description: 'All changelog entries for ${packageName}'`,
+		"order: 0",
+	];
+
+	// todo: fix tag url - should point either to the current release or the full changelog if the all version page
+	const header = `<ReleaseHeader href="${url}" />`;
+	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
+
+	const fileContent = `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n\n${tags}${content}`;
+	writeFileSync(join(workingDir, "all_versions.md"), fileContent);
+}
+
+/**
+ * write an index page with links to all packages
+ */
+export function writeIndexPage(packages: string[]): void {
+	const indexPath = join(baseDir, "index.md");
+	mkdirSync(join(baseDir), { recursive: true });
+
+	const packageLinks = packages
+		.map((pkg) => `- [${pkg}](/${pkg}/all_versions.html)`)
+		.join("\n");
+
+	const summaryTable = getSummaryTable(repositories);
+
+	const indexPage = [
+		"---",
+		note,
+		`title: 'Tauri Releases'`,
+		`order: 1`,
+		`aside: false`,
+		"---",
+		"",
+		"# Tauri Releases",
+		"",
+		"## Packages",
+		"",
+		summaryTable,
+		"",
+		packageLinks,
+	].join("\n");
+
+	writeFileSync(indexPath, indexPage);
+}

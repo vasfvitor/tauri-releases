@@ -13,6 +13,8 @@ const vitepressSidebarOptions: VitePressSidebarOptions = {
 	collapseDepth: 1,
 	documentRootPath: srcDir,
 	sortMenusByFrontmatterOrder: true,
+	useTitleFromFrontmatter: true,
+	frontmatterTitleFieldName: "sidebar",
 };
 
 // https://vitepress.dev/reference/site-config
@@ -21,6 +23,9 @@ export default defineConfig({
 	description: "A VitePress Site",
 	srcDir,
 	themeConfig: {
+		search: {
+			provider: "local",
+		},
 		// https://vitepress.dev/reference/default-theme-config
 		nav: [
 			{ text: "Home", link: "/" },
