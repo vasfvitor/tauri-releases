@@ -1,5 +1,6 @@
 # TODO
 
+improve the dir structure so that generated goes to /content/generated but keeps the url structure - or maybe  /content/release
 edit url
 action to build weekly
 warning about last update
@@ -8,10 +9,8 @@ issue template?
 update to vitepress 2 when it goes live, and sidebar updates to vitepress 2
 review packages list and copy
 create weekly-ish cache to be used on pr previews? also locally, to avoid rate-limitting and you know
-update biome
 
 
-make use of dynamic routing instead of generating
 
 
 https://crates.io/api/v1/crates/tauri
