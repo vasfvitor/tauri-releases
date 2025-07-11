@@ -8,6 +8,11 @@ next: false
 ---
 
 
+<script setup>
+import ReleasesTable from '../components/ReleasesTable/ReleasesTable.vue';
+</script>
+
+
 <ClientOnly>
 <ReleasesTable/>
 </ClientOnly>

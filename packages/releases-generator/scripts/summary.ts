@@ -26,9 +26,9 @@ export function getSummaryTable(repositoriesList: Repository[]): string {
 				const url = `${cratesUrl}/${crate}`;
 				componentLinks.push(`[**${name} (crate)**](${url})`);
 
-				const badgeUrl = `${shieldUrl}/crates/v/${crate}.svg)](${cratesPath}`;
+				const badgeUrl = `${shieldUrl}/crates/v/${crate}.svg`;
 
-				versionBadges.push(`[![crates.io version](${badgeUrl})`);
+				versionBadges.push(`![crates.io version](${badgeUrl})`);
 			}
 
 			if (npmPath) {
@@ -37,8 +37,9 @@ export function getSummaryTable(repositoriesList: Repository[]): string {
 
 				componentLinks.push(`[**${name} (npm)**](${url})`);
 
-				const badgeUrl = `${shieldUrl}/npm/v/${npmName}.svg)](${npmPath}`;
-				versionBadges.push(`[![npm version](${badgeUrl})`);
+				const badgeUrl = `${shieldUrl}/npm/v/${npmName}.svg`;
+
+				versionBadges.push(`![npm version](${badgeUrl})`);
 			}
 
 			const packageNameLink = componentLinks.join("<br>");

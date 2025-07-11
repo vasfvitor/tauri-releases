@@ -14,7 +14,9 @@ export function generatePagesAndTableData(
 	packageData: PackageData,
 	outputDir: string = baseDir,
 ) {
+	console.log("generating table...");
 	writeTableData(packageData, outputDir);
+	console.log("generating pages...");
 	writePageData(packageData, outputDir);
 }
 
@@ -69,10 +71,6 @@ export function writePageData(
 	});
 
 	writeIndexPage(packageNames);
-
-	console.log(
-		`Generated pages for ${packageNames.length} packages in ${outputDir}`,
-	);
 }
 
 export function writeTableData(

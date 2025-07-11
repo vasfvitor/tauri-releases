@@ -25,7 +25,7 @@ export function writeVersionPage(params: {
 	];
 
 	const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
-	const header = `<ReleaseHeader href="${tag}/${packageName}-v${version}" />`;
+	const header = `<ReleaseHeader githubRelease="${tag}/${packageName}-v${version}" />`;
 
 	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
 

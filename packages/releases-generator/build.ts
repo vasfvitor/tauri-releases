@@ -17,7 +17,6 @@ async function buildSite() {
 		packageData = await fetchData(repositories);
 		writeOutput(packageData, "data.json");
 	}
-	console.log("generating pages...");
 	generatePagesAndTableData(packageData);
 }
 

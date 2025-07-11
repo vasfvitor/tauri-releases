@@ -22,6 +22,25 @@ export default defineConfig({
 	title: "Tauri Releases",
 	description: "A VitePress Site",
 	srcDir,
+	base: "/tr/",
+	vite: {
+		ssr: {
+			noExternal: [/\.css$/, /\?vue&type=style/, /^vuetify/],
+		},
+		// build: {
+		// 	rollupOptions: {
+		// 		output: {
+		// 			manualChunks(id) {
+		// 				if (id.includes("node_modules")) {
+		// 					if (id.includes("vue")) return "vue-vendor";
+		// 					if (id.includes("vuetify")) return "vuetify-vendor";
+		// 					return "vendor";
+		// 				}
+		// 			},
+		// 		},
+		// 	},
+		// },
+	},
 	themeConfig: {
 		search: {
 			provider: "local",
@@ -41,4 +60,14 @@ export default defineConfig({
 			{ icon: "mastodon", link: "https://fosstodon.org/@TauriApps" },
 		],
 	},
+
+	ignoreDeadLinks: [
+		"/playground",
+		// ignore all localhost links
+		/^https?:\/\/localhost/,
+		// custom function, ignore all links include "ignore"
+		(url) => {
+			return url.toLowerCase().includes("ignore");
+		},
+	],
 });
