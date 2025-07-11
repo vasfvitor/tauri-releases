@@ -22,7 +22,6 @@ export default defineConfig({
 	title: "Tauri Releases",
 	description: "A VitePress Site",
 	srcDir,
-	base: "/tr/",
 	vite: {
 		ssr: {
 			noExternal: [/\.css$/, /\?vue&type=style/, /^vuetify/],
@@ -41,6 +40,7 @@ export default defineConfig({
 		// 	},
 		// },
 	},
+	metaChunk:true,
 	themeConfig: {
 		search: {
 			provider: "local",
