@@ -5,6 +5,8 @@ import {
     createColumnHelper,
     getFilteredRowModel,
     type ColumnFiltersState,
+    type ColumnDef,
+    FlexRender,
 } from '@tanstack/vue-table';
 import { ref, watch, computed } from 'vue';
 
@@ -13,31 +15,53 @@ import type { TableData } from '../../packages/releases-generator/types';
 
 function formatDate(val) {
     if (!val || val === "-") return '-';
-    try {
-        const date = new Date(val);
-        return date.toISOString().split("T")[0];
-    } catch (error) {
-        return ''
-    }
+    const date = new Date(val);
+    return date.toISOString().split("T")[0];
 }
+
+const dateInRange = (row, columnId, filterValue) => {
+    const value = new Date(row.getValue(columnId));
+    const from = filterValue?.from ? new Date(filterValue.from) : null;
+    const to = filterValue?.to ? new Date(filterValue.to) : null;
+
+    if (from && value < from) return false;
+    if (to && value > to) return false;
+    return true;
+};
+
+const strictIncludes = (row, columnId, filterValues: string[]) => {
+    const cellValue = row.getValue(columnId);
+    return filterValues.includes(cellValue);
+};
+
 
 const { repoList, packages } = sourceData.tableMetadata
 
 const data = ref<TableData[]>(sourceData.tableData);
+const dateRange = ref<{ from: string | null, to: string | null }>({ from: null, to: null });
+
 const columnFilters = ref<ColumnFiltersState>([]);
-const globalFilter = ref('');
 
 
 const columnHelper = createColumnHelper<TableData>();
-const columns = [
+const columns: ColumnDef<TableData, string>[] = [
+    columnHelper.accessor('repo', {
+        header: 'Repository',
+        filterFn: 'equals',
+    }),
+
     columnHelper.accessor('name', {
         header: 'Package',
-        filterFn: 'arrIncludes',
+        filterFn: strictIncludes,
     }),
+
     columnHelper.accessor('version', { header: 'Version' }),
+
     columnHelper.accessor('date', {
         header: 'Release Date',
         cell: info => formatDate(info.getValue()),
+        enableColumnFilter: true,
+        filterFn: dateInRange,
     }),
 ];
 
@@ -50,17 +74,12 @@ const table = useVueTable({
         get columnFilters() {
             return columnFilters.value;
         },
-        get globalFilter() {
-            return globalFilter.value;
-        },
-    },
 
-
-    onColumnFiltersChange: updaterOrValue => {
-        columnFilters.value = typeof updaterOrValue === 'function' ? updaterOrValue(columnFilters.value) : updaterOrValue;
     },
-    onGlobalFilterChange: value => {
-        globalFilter.value = value;
+    onColumnFiltersChange: (t) => {
+        columnFilters.value = typeof t === 'function'
+            ? t(columnFilters.value)
+            : t
     },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -70,7 +89,6 @@ const table = useVueTable({
 //     data.value = defaultData
 // }
 
-
 const selectedRepo = ref<string>(repoList[0]);
 const selectedProjects = ref<string[]>([]);
 
@@ -78,17 +96,27 @@ const filteredPackages = computed(() => {
     return packages[selectedRepo.value] || [];
 });
 
-watch(selectedRepo, () => {
+watch(selectedRepo, (newRepo) => {
+    table.getColumn('repo')?.setFilterValue(newRepo);
     selectedProjects.value = [...filteredPackages.value];
 }, { immediate: true });
 
+
 watch(selectedProjects, (newProjects) => {
-    table.getColumn('packageName')?.setFilterValue(newProjects.length > 0 ? newProjects : undefined);
+    const col = table.getColumn('name');
+    if (col) {
+        col.setFilterValue(newProjects.length ? newProjects : undefined);
+    }
 });
+watch(dateRange, (range) => {
+
+    table.getColumn('date')?.setFilterValue(range);
+}, { immediate: true });
 
 
 
 </script>
+
 
 <template>
     <v-row>
@@ -103,7 +131,14 @@ watch(selectedProjects, (newProjects) => {
                 </template>
             </v-select>
         </v-col>
-
+    </v-row>
+    <v-row>
+        <v-col>
+            <v-text-field type="date" v-model="dateRange.from" label="From" />
+        </v-col>
+        <v-col>
+            <v-text-field type="date" v-model="dateRange.to" label="To" />
+        </v-col>
     </v-row>
 
 

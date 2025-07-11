@@ -251,5 +251,8 @@ function generateTableData(
 	tableData: TableData[],
 	tableMetadata: TableMetadata,
 ): void {
-	writeOutput({ tableMetadata, tableData }, "tableData.json");
+	writeOutput(
+		{ tableMetadata, tableData: tableData.reverse() },
+		"tableData.json",
+	);
 }
