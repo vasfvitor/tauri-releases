@@ -1,12 +1,4 @@
-import {
-	getCoreRowModel,
-	useVueTable,
-	createColumnHelper,
-	getFilteredRowModel,
-	type ColumnFiltersState,
-	type ColumnDef,
-	FlexRender,
-} from "@tanstack/vue-table";
+import { createColumnHelper, type ColumnDef } from "@tanstack/vue-table";
 import { format, isBefore, parseISO } from "date-fns";
 import { h } from "vue";
 import type { TableData } from "../../../packages/releases-generator/types";
@@ -70,8 +62,6 @@ export function createColumns(showChangelogPopup) {
 					"a",
 					{
 						href: "#",
-						// todo: render markdown
-
 						onClick: (event) => {
 							event.preventDefault();
 							showChangelogPopup(changelogContent);
