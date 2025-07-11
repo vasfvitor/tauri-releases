@@ -1,10 +1,6 @@
-import { dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-
 export const note =
 	"\n#### NOTE: This file is auto-generated in packages/releases-generator/build.ts";
 
-export const __dirname = dirname(fileURLToPath(import.meta.url));
 export const baseDir = "../../src/content";
 
 // const releaseBaseUrl () => = ""

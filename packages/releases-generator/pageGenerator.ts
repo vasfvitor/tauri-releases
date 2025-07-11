@@ -1,7 +1,7 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { baseDir, note } from "./config";
-import { entitify, writeOutput } from "./utils";
+import { entitify, parseMarkdown, writeOutput } from "./utils";
 import { rcompare } from "semver";
 import type { PackageData, TableData, TableMetadata } from "./types";
 
@@ -176,14 +176,14 @@ export function generatePagesAndTableData(
 		releases.forEach((release, i) => {
 			const { version, notes } = release;
 			const { npmData, cratesData } = data;
-			const processedNotes = entitify(notes);
+			const { rawMd, parsedMd } = parseMarkdown(notes);
 
-			allContent.unshift(`\n\n## v${version}\n\n${processedNotes}`);
+			allContent.unshift(`\n\n## v${version}\n\n${rawMd}`);
 
 			generateVersionPage({
 				packageName,
 				version,
-				notes: processedNotes,
+				notes: rawMd,
 				// todo: fix tag url - should point either to the current release or the full changelog if the all version page
 				tag: packageName,
 				workingDir,
@@ -204,7 +204,7 @@ export function generatePagesAndTableData(
 					packageName,
 					version,
 					date,
-					changelog: processedNotes,
+					changelog: parsedMd,
 					repo,
 				}),
 			);

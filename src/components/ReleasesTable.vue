@@ -84,11 +84,12 @@ const columns: ColumnDef<TableData, string>[] = [
             return h('a', {
                 href: '#',
                 // todo: render markdown
+
                 onClick: (event) => {
                     event.preventDefault();
                     showChangelogPopup(changelogContent);
                 },
-            }, 'expand');
+            }, 'see more');
         },
 
     }),
@@ -156,15 +157,31 @@ watch(filterDate, (since) => {
 }, { immediate: true });
 
 
-const showChangelog = ref<string | null>(null);
+const dialogChangelogContent = ref<string | null>(null);
+const dialogVisible = ref(false);
 const showChangelogPopup = (content: string) => {
-    showChangelog.value = content;
-};
-const closeChangelog = () => {
-    showChangelog.value = null;
+    dialogChangelogContent.value = content;
+    dialogVisible.value = true;
 };
 
-const isChangelogVisible = computed(() => showChangelog.value !== null);
+const closeChangelog = () => {
+    dialogVisible.value = true;
+};
+
+const afterLeave = () => {
+    dialogChangelogContent.value = null;
+    dialogVisible.value = false;
+}
+
+const isChangelogVisible = ref(false);
+
+watch(dialogChangelogContent, (v) => {
+    isChangelogVisible.value = v !== null;
+});
+
+watch(isChangelogVisible, (visible) => {
+    if (!visible) closeChangelog();
+});
 
 watch(isChangelogVisible, (visible) => {
     if (!visible) closeChangelog();
@@ -212,15 +229,15 @@ watch(isChangelogVisible, (visible) => {
         </tbody>
     </v-table>
 
-    <v-dialog v-model="isChangelogVisible" max-width="600px">
+    <v-dialog @after-leave="afterLeave" v-model="isChangelogVisible" max-width="600px">
         <v-card>
-            <v-card-title>Changelog</v-card-title>
-            <v-card-text>
-                <div v-html="showChangelog"></div>
-            </v-card-text>
+            <v-card-title>Changelog </v-card-title>
             <v-card-actions>
                 <v-btn color="primary" text @click="closeChangelog">Close</v-btn>
             </v-card-actions>
+            <v-card-text>
+                <div class="vp-doc" v-html="dialogChangelogContent"></div>
+            </v-card-text>
         </v-card>
     </v-dialog>
 </template>
