@@ -7,7 +7,7 @@ import * as directives from "vuetify/directives";
 import { createVuetify } from "vuetify";
 
 import ReleaseHeader from "../../src/components/ReleaseHeader.vue";
-import ReleasesTable from "../../src/components/ReleasesTable.vue";
+import ReleasesTable from "../../src/components/ReleasesTable/ReleasesTable.vue";
 
 const vuetify = createVuetify({ components, directives });
 
