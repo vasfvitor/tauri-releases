@@ -8,7 +8,7 @@ import {
     type ColumnDef,
     FlexRender,
 } from '@tanstack/vue-table';
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, h } from 'vue';
 
 import sourceData from '../../packages/releases-generator/generated/tableData.json';
 import type { TableData } from '../../packages/releases-generator/types';
@@ -76,6 +76,29 @@ const columns: ColumnDef<TableData, string>[] = [
         enableColumnFilter: true,
         filterFn: dateInRange,
     }),
+
+    columnHelper.accessor('changelog', {
+        header: 'Changelog',
+        cell: info => {
+            const changelogContent = info.getValue();
+            return h('a', {
+                href: '#',
+                // todo: render markdown
+                onClick: (event) => {
+                    event.preventDefault();
+                    showChangelogPopup(changelogContent);
+                },
+            }, 'View');
+        },
+
+    }),
+
+    // todo: link to respective page - maybe it's best to add to TableData on build
+    columnHelper.display({
+        header: 'link',
+    })
+
+
 ];
 
 const table = useVueTable({
@@ -126,7 +149,19 @@ watch(filterDate, (since) => {
 }, { immediate: true });
 
 
+const showChangelog = ref<string | null>(null);
+const showChangelogPopup = (content: string) => {
+    showChangelog.value = content;
+};
+const closeChangelog = () => {
+    showChangelog.value = null;
+};
 
+const isChangelogVisible = computed(() => showChangelog.value !== null);
+
+watch(isChangelogVisible, (visible) => {
+    if (!visible) closeChangelog();
+});
 </script>
 
 
@@ -169,4 +204,16 @@ watch(filterDate, (since) => {
             </tr>
         </tbody>
     </v-table>
+
+    <v-dialog v-model="isChangelogVisible" max-width="600px">
+        <v-card>
+            <v-card-title>Changelog</v-card-title>
+            <v-card-text>
+                <div v-html="showChangelog"></div>
+            </v-card-text>
+            <v-card-actions>
+                <v-btn color="primary" text @click="closeChangelog">Close</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
