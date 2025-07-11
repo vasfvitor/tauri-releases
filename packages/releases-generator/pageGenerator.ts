@@ -103,17 +103,19 @@ function generateIndexPage(packages: string[]): void {
 		.map((pkg) => `- [${pkg}](/${pkg}/all_versions.html)`)
 		.join("\n");
 
+	// todo: generate summary table either in md or component
 	const indexPage = [
 		"---",
 		note,
-		`title: 'Tauri Core Ecosystem Releases'`,
+		`layout: home`,
+		`title: 'Tauri Releases'`,
 		"---",
 		"",
-		"# Tauri Core Ecosystem Releases",
+		"# Tauri Releases",
 		"",
 		"## Packages",
 		"",
-		"<ReleasesTable/>",
+		"<SummaryTable/>",
 		"",
 		packageLinks,
 	].join("\n");
