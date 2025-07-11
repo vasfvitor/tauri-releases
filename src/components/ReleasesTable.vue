@@ -17,7 +17,7 @@ import { parseISO, format, isBefore, subMonths } from 'date-fns';
 function formatDate(val) {
     if (!val || val === "-") return '-';
     const date = parseISO(val);
-    return format(date, "yyyy-MM-dd");
+    return format(date, "MMMM d, yyyy");
 
 }
 
@@ -88,14 +88,23 @@ const columns: ColumnDef<TableData, string>[] = [
                     event.preventDefault();
                     showChangelogPopup(changelogContent);
                 },
-            }, 'View');
+            }, 'expand');
         },
 
     }),
-
-    // todo: link to respective page - maybe it's best to add to TableData on build
     columnHelper.display({
-        header: 'link',
+        id: 'link',
+        header: 'Link',
+        cell: info => {
+            const { repo, name, version } = info.row.original;
+            const isRoot = repo === name && repo !== 'tauri'
+            const path = isRoot ? repo : `${repo}/${name}`;
+
+            // link to github?
+            return h('a', {
+                href: `/${path}/v${version}`
+            }, 'Link');
+        },
     })
 
 
@@ -121,9 +130,7 @@ const table = useVueTable({
     getFilteredRowModel: getFilteredRowModel(),
 });
 
-// const rerender = () => {
-//     data.value = defaultData
-// }
+
 
 const selectedRepo = ref<string>(repoList[0]);
 const selectedProjects = ref<string[]>([]);

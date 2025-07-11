@@ -7,6 +7,10 @@ export const note =
 export const __dirname = dirname(fileURLToPath(import.meta.url));
 export const baseDir = "../../src/content";
 
+// const releaseBaseUrl () => = ""
+// if repo === name, except tauri
+// releaseFormat = "repo/name/version"
+
 // todo: remove non userfacing packages
 // todo: deal with branches
 
