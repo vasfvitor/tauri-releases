@@ -3,7 +3,7 @@ name: Deploy VitePress Docs
 on:
   push:
     branches:
-      - main
+      - master
 
       # todo: cache pnpm: build releases and somehow use it in the docs build
 
