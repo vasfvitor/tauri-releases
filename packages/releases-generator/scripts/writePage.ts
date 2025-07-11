@@ -1,11 +1,12 @@
 import { mkdirSync, writeFileSync } from "node:fs";
-import { baseDir, note } from "../config";
+import { baseDir, note, repositories } from "../config";
 import { join } from "node:path";
+import { getSummaryTable } from "./summary";
 
 /**
- * Generate an individual page for each version
+ * write an individual page for each version
  */
-export function generateVersionPage(params: {
+export function writeVersionPage(params: {
 	packageName: string;
 	version: string;
 	notes: string;
@@ -34,7 +35,7 @@ export function generateVersionPage(params: {
 	writeFileSync(join(workingDir, fileName), content);
 }
 
-export function generateAllVersionsPage(params: {
+export function writeAllVersionsPage(params: {
 	packageName: string;
 	content: string;
 	url: string;
@@ -58,9 +59,9 @@ export function generateAllVersionsPage(params: {
 }
 
 /**
- * Generate an index page with links to all packages
+ * write an index page with links to all packages
  */
-export function generateIndexPage(packages: string[]): void {
+export function writeIndexPage(packages: string[]): void {
 	const indexPath = join(baseDir, "index.md");
 	mkdirSync(join(baseDir), { recursive: true });
 
@@ -68,18 +69,20 @@ export function generateIndexPage(packages: string[]): void {
 		.map((pkg) => `- [${pkg}](/${pkg}/all_versions.html)`)
 		.join("\n");
 
-	// todo: generate summary table either in md or component
+	const summaryTable = getSummaryTable(repositories);
+
 	const indexPage = [
 		"---",
 		note,
 		`title: 'Tauri Releases'`,
+		`order: 1`,
 		"---",
 		"",
 		"# Tauri Releases",
 		"",
 		"## Packages",
 		"",
-		"<SummaryTable/>",
+		summaryTable,
 		"",
 		packageLinks,
 	].join("\n");

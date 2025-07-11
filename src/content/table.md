@@ -1,5 +1,6 @@
 ---
-title: 'Tauri Core Ecosystem Releases'
+title: 'Changelog Table'
+order: '1'
 aside: false
 outline: false
 prev: false

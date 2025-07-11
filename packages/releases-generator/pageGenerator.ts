@@ -4,10 +4,10 @@ import { baseDir } from "./config";
 import { parseMarkdown, writeOutput } from "./utils";
 import type { PackageData, TableData, TableMetadata } from "./types";
 import {
-	generateVersionPage,
-	generateAllVersionsPage,
-	generateIndexPage,
-} from "./scripts/generatePage";
+	writeVersionPage,
+	writeAllVersionsPage,
+	writeIndexPage,
+} from "./scripts/writePage";
 import { parseAndSortChangelog } from "./scripts/parse";
 
 export function generatePagesAndTableData(
@@ -48,7 +48,7 @@ export function writePageData(
 
 			allContent.unshift(`\n\n## v${version}\n\n${rawMd}`);
 
-			generateVersionPage({
+			writeVersionPage({
 				packageName,
 				version,
 				notes: rawMd,
@@ -59,7 +59,7 @@ export function writePageData(
 			});
 		});
 
-		generateAllVersionsPage({
+		writeAllVersionsPage({
 			packageName,
 			content: allContent.join(""),
 			// todo: fix tag url -
@@ -68,7 +68,7 @@ export function writePageData(
 		});
 	});
 
-	generateIndexPage(packageNames);
+	writeIndexPage(packageNames);
 
 	console.log(
 		`Generated pages for ${packageNames.length} packages in ${outputDir}`,
