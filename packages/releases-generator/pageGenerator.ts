@@ -107,7 +107,6 @@ function generateIndexPage(packages: string[]): void {
 	const indexPage = [
 		"---",
 		note,
-		`layout: home`,
 		`title: 'Tauri Releases'`,
 		"---",
 		"",
