@@ -76,6 +76,7 @@ export function writeIndexPage(packages: string[]): void {
 		note,
 		`title: 'Tauri Releases'`,
 		`order: 1`,
+		`aside: false`,
 		"---",
 		"",
 		"# Tauri Releases",
