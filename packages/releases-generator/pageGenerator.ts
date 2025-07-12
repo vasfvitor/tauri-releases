@@ -47,9 +47,9 @@ export function writePageData(
 
 		releases.forEach((release, i) => {
 			const { version, notes } = release;
-			const { rawMd } = parseMarkdown(notes);
+			const rawMd = parseMarkdown(notes, "markdown");
 
-			allContent.unshift(`\n\n## v${version}\n\n${rawMd}`);
+			allContent.push(`\n\n## v${version}\n\n${rawMd}`);
 
 			writeVersionPage({
 				packageName,
@@ -64,7 +64,7 @@ export function writePageData(
 
 		writeAllVersionsPage({
 			packageName,
-			content: allContent.join(""),
+			content: allContent.reverse().join(""),
 			// todo: fix tag url -
 			url: data.npmData?.name || data.cratesData?.name,
 			workingDir,
@@ -123,7 +123,7 @@ export async function writeTableData(packageData: PackageData): Promise<void> {
 
 			const { version, notes } = release;
 			const { npmData, cratesData } = data;
-			const { parsedMd } = parseMarkdown(notes);
+			const parsedMd = parseMarkdown(notes, "html");
 
 			let date: string | undefined;
 			if (npmData?.versions?.[version]) {

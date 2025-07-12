@@ -4,12 +4,20 @@ import { marked } from "marked";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-export function parseMarkdown(content: string) {
+export function parseMarkdown(
+	content: string,
+	type: "markdown" | "html" = "markdown",
+) {
 	const hed = entitify(content);
 	const window = new JSDOM("").window;
 	const DOMPurify = createDOMPurify(window);
-
-	return { rawMd: hed, parsedMd: DOMPurify.sanitize(marked(hed)) };
+	if (type === "markdown") {
+		return hed;
+	}
+	if (type === "html") {
+		return DOMPurify.sanitize(marked(hed));
+	}
+	return "";
 }
 
 export function entitify(str: string): string {

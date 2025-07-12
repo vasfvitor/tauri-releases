@@ -17,7 +17,13 @@ async function buildSite() {
 		packageData = await fetchData(repositories);
 		writeOutput(packageData, "data.json");
 	}
-	generatePagesAndTableData(packageData);
+
+	try {
+		await generatePagesAndTableData(packageData);
+	} catch (error) {
+		console.error(error);
+		process.exit(1);
+	}
 }
 
 buildSite().catch((error) => {
