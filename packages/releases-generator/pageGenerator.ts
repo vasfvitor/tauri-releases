@@ -3,11 +3,11 @@ import { join } from "node:path";
 import { baseDir } from "./config";
 import { createWriteStream } from "node:fs";
 import { parseMarkdown } from "./utils";
-import type { PackageData, TableData, TableMetadata } from "./types";
+import type { PackageData, TableMetadata } from "./types";
 import {
 	writeVersionPage,
-	writeAllVersionsPage,
 	writeIndexPage,
+	getAllVersionsHead,
 } from "./scripts/writePage";
 import { parseAndSortChangelog } from "./scripts/parse";
 
@@ -43,13 +43,19 @@ export function writePageData(
 			console.warn(`missing releases ${packageName}`);
 		}
 
-		const allContent: string[] = [];
+		const allVersionsStream = createWriteStream(
+			join(workingDir, "all_versions.md"),
+		);
+
+		// todo: fix tag url -
+		const url = data.npmData?.name || data.cratesData?.name;
+		allVersionsStream.write(getAllVersionsHead(packageName, url));
 
 		releases.forEach((release, i) => {
 			const { version, notes } = release;
 			const rawMd = parseMarkdown(notes, "markdown");
 
-			allContent.push(`\n\n## v${version}\n\n${rawMd}`);
+			allVersionsStream.write(`\n\n## v${version}\n\n${rawMd}`);
 
 			writeVersionPage({
 				packageName,
@@ -62,13 +68,7 @@ export function writePageData(
 			});
 		});
 
-		writeAllVersionsPage({
-			packageName,
-			content: allContent.reverse().join(""),
-			// todo: fix tag url -
-			url: data.npmData?.name || data.cratesData?.name,
-			workingDir,
-		});
+		allVersionsStream.end();
 	});
 
 	writeIndexPage(packageNames);

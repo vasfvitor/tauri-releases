@@ -35,13 +35,7 @@ export function writeVersionPage(params: {
 	writeFileSync(join(workingDir, fileName), content);
 }
 
-export function writeAllVersionsPage(params: {
-	packageName: string;
-	content: string;
-	url: string;
-	workingDir: string;
-}): void {
-	const { packageName, content, url, workingDir } = params;
+export function getAllVersionsHead(packageName: string, url: string): string {
 	const frontmatter = [
 		note,
 		`title: '${packageName} - full changelog'`,
@@ -54,8 +48,8 @@ export function writeAllVersionsPage(params: {
 	const header = `<ReleaseHeader href="${url}" />`;
 	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
 
-	const fileContent = `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n\n${tags}${content}`;
-	writeFileSync(join(workingDir, "all_versions.md"), fileContent);
+	return `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n\n${tags}`;
+
 }
 
 /**

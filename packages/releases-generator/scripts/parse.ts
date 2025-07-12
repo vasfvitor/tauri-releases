@@ -37,7 +37,7 @@ export function parseAndSortChangelog(changelog: string): Release[] {
 	const releases = parseChangelog(changelog);
 
 	releases.sort((a, b) => {
-		return rcompare(b.version, a.version);
+		return rcompare(a.version, b.version);
 	});
 	return releases;
 }
