@@ -22,6 +22,7 @@ export default defineConfig({
 	title: "Tauri Releases",
 	description: "A VitePress Site",
 	srcDir,
+	base: "/tauri-releases/",
 	vite: {
 		ssr: {
 			noExternal: [/\.css$/, /\?vue&type=style/, /^vuetify/],
@@ -51,7 +52,7 @@ export default defineConfig({
 			{ text: "Documentation", link: "https://tauri.app/" },
 		],
 
-		sidebar: generateSidebar(vitepressSidebarOptions),
+		
 
 		socialLinks: [
 			{ icon: "github", link: "https://github.com/tauri-apps/tauri" },

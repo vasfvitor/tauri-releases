@@ -2,6 +2,7 @@ import { createColumnHelper, type ColumnDef } from "@tanstack/vue-table";
 import { format, isBefore, parseISO } from "date-fns";
 import { h } from "vue";
 import type { TableData } from "../../../packages/releases-generator/types";
+import { useData } from "vitepress";
 
 const strictIncludes = (row, columnId, filterValues: string[]) => {
 	const cellValue = row.getValue(columnId);
@@ -79,11 +80,18 @@ export function createColumns(showChangelogPopup) {
 				const isRoot = repo === name && repo !== "tauri";
 				const path = isRoot ? repo : `${repo}/${name}`;
 
+
+				const { site } = useData();
+				
+				let to = `/${path}/v${version}`
+				if (site.value.base) {
+					to = `${site.value.base}${to}`;
+				}
 				// link to github?
 				return h(
 					"a",
 					{
-						href: `/${path}/v${version}`,
+						href:to ,
 					},
 					"Link",
 				);
