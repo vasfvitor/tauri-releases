@@ -1,7 +1,8 @@
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { baseDir } from "./config";
-import { parseMarkdown, writeOutput } from "./utils";
+import { createWriteStream } from "node:fs";
+import { parseMarkdown } from "./utils";
 import type { PackageData, TableData, TableMetadata } from "./types";
 import {
 	writeVersionPage,
@@ -10,12 +11,12 @@ import {
 } from "./scripts/writePage";
 import { parseAndSortChangelog } from "./scripts/parse";
 
-export function generatePagesAndTableData(
+export async function generatePagesAndTableData(
 	packageData: PackageData,
 	outputDir: string = baseDir,
 ) {
 	console.log("generating table...");
-	writeTableData(packageData, outputDir);
+	await writeTableData(packageData);
 	console.log("generating pages...");
 	writePageData(packageData, outputDir);
 }
@@ -73,41 +74,53 @@ export function writePageData(
 	writeIndexPage(packageNames);
 }
 
-export function writeTableData(
-	packageData: PackageData,
-	outputDir: string = baseDir,
-): void {
-	const tableRows: TableData[] = [];
+export async function writeTableData(packageData: PackageData): Promise<void> {
 	const tableMetadata: TableMetadata = {
 		packages: {},
 		repoList: [],
 	};
 	const repoList = new Set<string>();
 
+	const tableDataPath = join("generated", "tableData.json");
+
+	const stream = createWriteStream(tableDataPath);
+
+	stream.write('{\n"tableMetadata": ');
+
 	Object.entries(packageData).forEach(([packageName, data]) => {
 		const key = data.group || packageName;
 		if (!tableMetadata.packages[key]) {
 			tableMetadata.packages[key] = [];
 		}
-		// @ts-expect-error
-		tableMetadata.packages[key].push(packageName);
+		(tableMetadata.packages[key] as string[]).push(packageName);
+		repoList.add(data.group || packageName);
+	});
+	tableMetadata.repoList = Array.from(repoList);
+
+	stream.write(JSON.stringify(tableMetadata, null, 2));
+	// open
+	stream.write(',\n"tableData": [');
+
+	let isFirst = true;
+
+	for (const [packageName, data] of Object.entries(packageData)) {
 		const repo = data.group || packageName;
-		repoList.add(repo);
-
-		const fullName = `${data.group || ""}/${packageName}`;
-
-		const workingDir = join(outputDir, fullName);
-		mkdirSync(workingDir, { recursive: true });
 
 		if (!data.changelogs) {
 			console.warn(`missing changelog ${packageName}`);
 		}
+
 		const releases = parseAndSortChangelog(data.changelogs);
+
 		if (releases.length === 0) {
 			console.warn(`missing releases ${packageName}`);
 		}
 
-		releases.forEach((release) => {
+		for (const release of releases) {
+			if (!isFirst) {
+				stream.write(",");
+			}
+
 			const { version, notes } = release;
 			const { npmData, cratesData } = data;
 			const { parsedMd } = parseMarkdown(notes);
@@ -120,22 +133,18 @@ export function writeTableData(
 				date = data.cratesData.versions[version];
 			}
 
-			tableRows.push({
+			const row = {
 				name: packageName,
 				repo,
 				version,
 				changelog: parsedMd,
 				date: date || "-",
-			});
-			//
-		});
-	});
-
-	tableMetadata.repoList = Array.from(repoList);
-	const tableData: { tableData: TableData[]; tableMetadata: TableMetadata } = {
-		tableMetadata,
-		// reverse to order versions
-		tableData: tableRows.reverse(),
-	};
-	writeOutput(tableData, "tableData.json");
+			};
+			stream.write(JSON.stringify(row));
+			isFirst = false;
+		}
+	}
+	// close
+	stream.write("]\n}");
+	stream.end();
 }
