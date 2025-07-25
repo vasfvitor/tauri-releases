@@ -1,0 +1,414 @@
+[
+    {
+        "text": "create-tauri-app",
+        "items": [
+            {
+                "text": "Full Changelog",
+                "link": "/create-tauri-app/all_versions"
+            }
+        ],
+        "collapsed": true
+    },
+    {
+        "text": "plugins-workspace",
+        "items": [
+            {
+                "text": "autostart",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/autostart/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "barcode-scanner",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/barcode-scanner/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "biometric",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/biometric/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "clipboard-manager",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/clipboard-manager/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "deep-link",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/deep-link/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "dialog",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/dialog/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "fs",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/fs/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "global-shortcut",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/global-shortcut/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "http",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/http/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "log",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/log/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "nfc",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/nfc/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "notification",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/notification/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "os",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/os/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "positioner",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/positioner/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "process",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/process/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "shell",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/shell/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "sql",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/sql/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "store",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/store/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "stronghold",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/stronghold/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "updater",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/updater/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "upload",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/upload/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "websocket",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/websocket/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "window-state",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/plugins-workspace/window-state/all_versions"
+                    }
+                ],
+                "collapsed": true
+            }
+        ],
+        "collapsed": true
+    },
+    {
+        "text": "tao",
+        "items": [
+            {
+                "text": "Full Changelog",
+                "link": "/tao/all_versions"
+            }
+        ],
+        "collapsed": true
+    },
+    {
+        "text": "wry",
+        "items": [
+            {
+                "text": "Full Changelog",
+                "link": "/wry/all_versions"
+            }
+        ],
+        "collapsed": true
+    },
+    {
+        "text": "tauri",
+        "items": [
+            {
+                "text": "@tauri-apps",
+                "items": [
+                    {
+                        "text": "api",
+                        "items": [
+                            {
+                                "text": "Full Changelog",
+                                "link": "/tauri/@tauri-apps/api/all_versions"
+                            }
+                        ],
+                        "collapsed": true
+                    },
+                    {
+                        "text": "cli",
+                        "items": [
+                            {
+                                "text": "Full Changelog",
+                                "link": "/tauri/@tauri-apps/cli/all_versions"
+                            }
+                        ],
+                        "collapsed": true
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-build",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-build/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-bundler",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-bundler/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-cli",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-cli/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-codegen",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-codegen/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-driver",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-driver/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-macros",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-macros/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-plugin",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-plugin/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-runtime",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-runtime/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-runtime-wry",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-runtime-wry/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri-utils",
+                "items": [
+                    {
+                        "text": "Full Changelog",
+                        "link": "/tauri/tauri-utils/all_versions"
+                    }
+                ],
+                "collapsed": true
+            }
+        ],
+        "collapsed": true
+    },
+    {
+        "text": "Changelog Table",
+        "link": "/table"
+    }
+]

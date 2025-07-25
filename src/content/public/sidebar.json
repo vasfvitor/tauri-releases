@@ -1,0 +1,180 @@
+[
+    {
+        "text": "create-tauri-app",
+        "link": "/create-tauri-app/all_versions"
+    },
+    {
+        "text": "tao",
+        "link": "/tao/all_versions"
+    },
+    {
+        "text": "wry",
+        "link": "/wry/all_versions"
+    },
+    {
+        "text": "tauri",
+        "items": [
+            {
+                "text": "@tauri-apps",
+                "items": [
+                    {
+                        "text": "api",
+                        "link": "/tauri/@tauri-apps/api/all_versions"
+                    },
+                    {
+                        "text": "cli",
+                        "link": "/tauri/@tauri-apps/cli/all_versions"
+                    }
+                ],
+                "collapsed": true
+            },
+            {
+                "text": "tauri",
+                "link": "/tauri/tauri/all_versions"
+            },
+            {
+                "text": "tauri-build",
+                "link": "/tauri/tauri-build/all_versions"
+            },
+            {
+                "text": "tauri-bundler",
+                "link": "/tauri/tauri-bundler/all_versions"
+            },
+            {
+                "text": "tauri-cli",
+                "link": "/tauri/tauri-cli/all_versions"
+            },
+            {
+                "text": "tauri-codegen",
+                "link": "/tauri/tauri-codegen/all_versions"
+            },
+            {
+                "text": "tauri-driver",
+                "link": "/tauri/tauri-driver/all_versions"
+            },
+            {
+                "text": "tauri-macros",
+                "link": "/tauri/tauri-macros/all_versions"
+            },
+            {
+                "text": "tauri-plugin",
+                "link": "/tauri/tauri-plugin/all_versions"
+            },
+            {
+                "text": "tauri-runtime",
+                "link": "/tauri/tauri-runtime/all_versions"
+            },
+            {
+                "text": "tauri-runtime-wry",
+                "link": "/tauri/tauri-runtime-wry/all_versions"
+            },
+            {
+                "text": "tauri-utils",
+                "link": "/tauri/tauri-utils/all_versions"
+            }
+        ],
+        "collapsed": true
+    },
+    {
+        "text": "plugins",
+        "items": [
+            {
+                "text": "autostart",
+                "link": "/plugins-workspace/autostart/all_versions"
+            },
+            {
+                "text": "barcode-scanner",
+                "link": "/plugins-workspace/barcode-scanner/all_versions"
+            },
+            {
+                "text": "biometric",
+                "link": "/plugins-workspace/biometric/all_versions"
+            },
+            {
+                "text": "clipboard-manager",
+                "link": "/plugins-workspace/clipboard-manager/all_versions"
+            },
+            {
+                "text": "deep-link",
+                "link": "/plugins-workspace/deep-link/all_versions"
+            },
+            {
+                "text": "dialog",
+                "link": "/plugins-workspace/dialog/all_versions"
+            },
+            {
+                "text": "fs",
+                "link": "/plugins-workspace/fs/all_versions"
+            },
+            {
+                "text": "global-shortcut",
+                "link": "/plugins-workspace/global-shortcut/all_versions"
+            },
+            {
+                "text": "http",
+                "link": "/plugins-workspace/http/all_versions"
+            },
+            {
+                "text": "log",
+                "link": "/plugins-workspace/log/all_versions"
+            },
+            {
+                "text": "nfc",
+                "link": "/plugins-workspace/nfc/all_versions"
+            },
+            {
+                "text": "notification",
+                "link": "/plugins-workspace/notification/all_versions"
+            },
+            {
+                "text": "os",
+                "link": "/plugins-workspace/os/all_versions"
+            },
+            {
+                "text": "positioner",
+                "link": "/plugins-workspace/positioner/all_versions"
+            },
+            {
+                "text": "process",
+                "link": "/plugins-workspace/process/all_versions"
+            },
+            {
+                "text": "shell",
+                "link": "/plugins-workspace/shell/all_versions"
+            },
+            {
+                "text": "sql",
+                "link": "/plugins-workspace/sql/all_versions"
+            },
+            {
+                "text": "store",
+                "link": "/plugins-workspace/store/all_versions"
+            },
+            {
+                "text": "stronghold",
+                "link": "/plugins-workspace/stronghold/all_versions"
+            },
+            {
+                "text": "updater",
+                "link": "/plugins-workspace/updater/all_versions"
+            },
+            {
+                "text": "upload",
+                "link": "/plugins-workspace/upload/all_versions"
+            },
+            {
+                "text": "websocket",
+                "link": "/plugins-workspace/websocket/all_versions"
+            },
+            {
+                "text": "window-state",
+                "link": "/plugins-workspace/window-state/all_versions"
+            }
+        ],
+        "collapsed": true
+    },
+    {
+        "text": "Changelog Table",
+        "link": "/table"
+    }
+]

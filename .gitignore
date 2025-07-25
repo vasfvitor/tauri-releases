@@ -1,6 +1,16 @@
 .vitepress/dist
 .vitepress/cache
 node_modules
-src/content
+
 packages/releases-generator/.cache
+
 /.vitepress/.temp
+
+# generated files
+src/content/create-tauri-app
+src/content/tao
+src/content/tauri
+src/content/wry
+src/content/plugins-workspace
+src/content/index.md
+src/content/tableData.json
