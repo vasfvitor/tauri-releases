@@ -3,7 +3,7 @@
 const back = () => history.back();
 
 defineProps<{
-	githubRelease: string;
+  githubRelease: string;
 }>();
 </script>
 

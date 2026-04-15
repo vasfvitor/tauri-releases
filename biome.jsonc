@@ -1,47 +1,47 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
-	"vcs": {
-		"enabled": false,
-		"clientKind": "git",
-		"useIgnoreFile": false
-	},
-	"files": {
-		"ignoreUnknown": false,
-		"includes": [
-			"**",
-			"!.vitepress/cache/**",
-			"!.vitepress/dist/**",
-			"!.vitepress/.temp/**",
-			"!packages/releases-generator/generated/**",
-			"!src/content/**",
-			"!sidebar.json"
-		]
-	},
-	"formatter": {
-		"enabled": true,
-		"indentStyle": "space",
-		"lineEnding": "lf"
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": true
-		},
-		"domains": {
-			"vue": "all"
-		}
-	},
-	"javascript": {
-		"formatter": {
-			"quoteStyle": "double"
-		}
-	},
-	"assist": {
-		"enabled": true,
-		"actions": {
-			"source": {
-				"organizeImports": "on"
-			}
-		}
-	}
+  "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!.vitepress/cache",
+      "!.vitepress/dist",
+      "!.vitepress/.temp",
+      "!packages/releases-generator/generated",
+      "!src/content",
+      "!sidebar.json"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "lineEnding": "lf"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    },
+    "domains": {
+      "vue": "all"
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
 }

@@ -3,23 +3,48 @@ import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 
 import { createVuetify } from "vuetify";
-import * as components from "vuetify/components";
-import * as directives from "vuetify/directives";
+import {
+  VBtn,
+  VCard,
+  VCardText,
+  VCardTitle,
+  VCol,
+  VDialog,
+  VDivider,
+  VRow,
+  VSelect,
+  VTable,
+  VTextField,
+} from "vuetify/components";
 
 import ReleaseHeader from "../../src/components/ReleaseHeader.vue";
 
-const vuetify = createVuetify({ components, directives });
+const vuetify = createVuetify({
+  components: {
+    VBtn,
+    VCard,
+    VCardText,
+    VCardTitle,
+    VCol,
+    VDialog,
+    VDivider,
+    VRow,
+    VSelect,
+    VTable,
+    VTextField,
+  },
+});
 
 // import "./styles/theme.css";
 // import "./styles/custom.css";
 import "vuetify/styles";
 
 export default {
-	extends: DefaultTheme,
-	enhanceApp({ app }) {
-		app.use(vuetify);
-		// register your custom global components
-		app.component("ReleaseHeader", ReleaseHeader);
-		app.component("FlexRender", FlexRender);
-	},
+  extends: DefaultTheme,
+  enhanceApp({ app }) {
+    app.use(vuetify);
+    // register your custom global components
+    app.component("ReleaseHeader", ReleaseHeader);
+    app.component("FlexRender", FlexRender);
+  },
 } satisfies Theme;

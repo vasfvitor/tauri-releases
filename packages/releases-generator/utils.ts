@@ -4,48 +4,50 @@ import createDOMPurify from "dompurify";
 import { JSDOM } from "jsdom";
 import { marked } from "marked";
 
-const window = new JSDOM("").window;
-const DOMPurify = createDOMPurify(window);
+const window = new JSDOM("").window as unknown as Window;
+const DOMPurify = createDOMPurify(
+  window as unknown as Parameters<typeof createDOMPurify>[0],
+);
 
 export function parseMarkdown(
-	content: string,
-	type: "markdown" | "html" = "markdown",
+  content: string,
+  type: "markdown" | "html" = "markdown",
 ): string {
-	const hed = entitify(content);
-	if (type === "markdown") {
-		return hed;
-	}
-	if (type === "html") {
-		return DOMPurify.sanitize(marked(hed, { async: false }));
-	}
-	return "";
+  const hed = entitify(content);
+  if (type === "markdown") {
+    return hed;
+  }
+  if (type === "html") {
+    return DOMPurify.sanitize(marked(hed, { async: false }));
+  }
+  return "";
 }
 
 export function entitify(str: string): string {
-	return str
-		.replace(/[&<>"']/g, (entity) => {
-			switch (entity) {
-				case "&":
-					return "&amp;";
-				case "<":
-					return "&lt;";
-				case ">":
-					return "&gt;";
-				case '"':
-					return "&quot;";
-				case "'":
-					return "&#39;";
-				default:
-					return entity;
-			}
-		})
-		.replace(/\$\{/g, "$\\{");
+  return str
+    .replace(/[&<>"']/g, (entity) => {
+      switch (entity) {
+        case "&":
+          return "&amp;";
+        case "<":
+          return "&lt;";
+        case ">":
+          return "&gt;";
+        case '"':
+          return "&quot;";
+        case "'":
+          return "&#39;";
+        default:
+          return entity;
+      }
+    })
+    .replace(/\$\{/g, "$\\{");
 }
 
 export function writeOutput(output: string | unknown, fileName: string): void {
-	const path = "generated";
-	mkdirSync(path, { recursive: true });
-	const filePath = join(path, fileName);
+  const path = "generated";
+  mkdirSync(path, { recursive: true });
+  const filePath = join(path, fileName);
 
-	writeFileSync(filePath, JSON.stringify(output, null, 2), "utf-8");
+  writeFileSync(filePath, JSON.stringify(output, null, 2), "utf-8");
 }

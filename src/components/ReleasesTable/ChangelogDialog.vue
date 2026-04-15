@@ -2,8 +2,8 @@
 import { ref, watch } from "vue";
 
 const props = defineProps<{
-	modelValue: boolean;
-	content: string | null;
+  modelValue: boolean;
+  content: string | null;
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
@@ -11,14 +11,14 @@ const emit = defineEmits(["update:modelValue"]);
 const localValue = ref(props.modelValue);
 
 watch(
-	() => props.modelValue,
-	(val) => {
-		localValue.value = val;
-	},
+  () => props.modelValue,
+  (val) => {
+    localValue.value = val;
+  },
 );
 
 watch(localValue, (val) => {
-	emit("update:modelValue", val);
+  emit("update:modelValue", val);
 });
 </script>
 

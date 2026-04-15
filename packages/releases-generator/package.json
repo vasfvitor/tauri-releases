@@ -1,29 +1,29 @@
 {
-	"name": "releases-generator",
-	"version": "1.0.0",
-	"description": "",
-	"type": "module",
-	"main": "index.js",
-	"scripts": {
-		"build": "tsm ./build.ts"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"@types/jsdom": "^21.1.7",
-		"@types/make-fetch-happen": "^10.0.4",
-		"@types/semver": "^7.5.8",
-		"dompurify": "^3.2.6",
-		"jsdom": "^26.1.0",
-		"make-fetch-happen": "^14.0.3",
-		"marked": "^16.0.0",
-		"package-json": "^10.0.1",
-		"semver": "^7.6.3",
-		"tsm": "^2.3.0"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "2.1.1",
-		"@types/node": "^22.5.5"
-	}
+  "name": "releases-generator",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsx ./build.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/make-fetch-happen": "^10.0.4",
+    "@types/semver": "^7.5.8",
+    "dompurify": "^3.2.6",
+    "jsdom": "^26.1.0",
+    "make-fetch-happen": "^14.0.3",
+    "marked": "^16.0.0",
+    "package-json": "^10.0.1",
+    "semver": "^7.6.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.1.1",
+    "@types/node": "^24.12.2",
+    "tsx": "^4.21.0"
+  }
 }

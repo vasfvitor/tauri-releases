@@ -7,79 +7,79 @@ import { getSummaryTable } from "./summary.js";
  * write an individual page for each version
  */
 export function writeVersionPage(params: {
-	packageName: string;
-	version: string;
-	notes: string;
-	// todo: fix tag url
-	tag: string;
-	workingDir: string;
-	order: number;
+  packageName: string;
+  version: string;
+  notes: string;
+  // todo: fix tag url
+  tag: string;
+  workingDir: string;
+  order: number;
 }): void {
-	const { packageName, version, notes, tag, workingDir, order } = params;
-	const pageFrontmatter = [
-		note,
-		`title: '${packageName}@${version}'`,
-		`sidebar: '${version}'`,
-		`description: '${version}'`,
-		`order: ${order}`,
-	];
+  const { packageName, version, notes, tag, workingDir, order } = params;
+  const pageFrontmatter = [
+    note,
+    `title: '${packageName}@${version}'`,
+    `sidebar: '${version}'`,
+    `description: '${version}'`,
+    `order: ${order}`,
+  ];
 
-	const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
-	const header = `<ReleaseHeader githubRelease="${tag}/${packageName}-v${version}" />`;
+  const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
+  const header = `<ReleaseHeader githubRelease="${tag}/${packageName}-v${version}" />`;
 
-	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
+  const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
 
-	const content = `${frontmatter}\n\n${header}\n\n${tags}\n\n${notes}`;
-	const fileName = `v${version}.md`;
+  const content = `${frontmatter}\n\n${header}\n\n${tags}\n\n${notes}`;
+  const fileName = `v${version}.md`;
 
-	writeFileSync(join(workingDir, fileName), content);
+  writeFileSync(join(workingDir, fileName), content);
 }
 
 export function getAllVersionsHead(packageName: string, url: string): string {
-	const frontmatter = [
-		note,
-		`title: '${packageName} - full changelog'`,
-		`sidebar: 'Full Changelog'`,
-		`description: 'All changelog entries for ${packageName}'`,
-		"order: 0",
-	];
+  const frontmatter = [
+    note,
+    `title: '${packageName} - full changelog'`,
+    `sidebar: 'Full Changelog'`,
+    `description: 'All changelog entries for ${packageName}'`,
+    "order: 0",
+  ];
 
-	// todo: fix tag url - should point either to the current release or the full changelog if the all version page
-	const header = `<ReleaseHeader href="${url}" />`;
-	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
+  // todo: fix tag url - should point either to the current release or the full changelog if the all version page
+  const header = `<ReleaseHeader href="${url}" />`;
+  const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
 
-	return `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n\n${tags}`;
+  return `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n\n${tags}`;
 }
 
 /**
  * write an index page with links to all packages
  */
 export function writeIndexPage(packages: string[]): void {
-	const indexPath = join(baseDir, "index.md");
-	mkdirSync(join(baseDir), { recursive: true });
+  const indexPath = join(baseDir, "index.md");
+  mkdirSync(join(baseDir), { recursive: true });
 
-	const packageLinks = packages
-		.map((pkg) => `- [${pkg}](/${pkg}/all_versions.html)`)
-		.join("\n");
+  const packageLinks = packages
+    .map((pkg) => `- [${pkg}](/${pkg}/all_versions.html)`)
+    .join("\n");
 
-	const summaryTable = getSummaryTable(repositories);
+  const summaryTable = getSummaryTable(repositories);
 
-	const indexPage = [
-		"---",
-		note,
-		`title: 'Tauri Releases'`,
-		`order: 1`,
-		`aside: false`,
-		"---",
-		"",
-		"# Tauri Releases",
-		"",
-		"## Packages",
-		"",
-		summaryTable,
-		"",
-		packageLinks,
-	].join("\n");
+  const indexPage = [
+    "---",
+    note,
+    `title: 'Tauri Releases'`,
+    `order: 1`,
+    `aside: false`,
+    "---",
+    "",
+    "# Tauri Releases",
+    "",
+    "## Packages",
+    "",
+    summaryTable,
+    "",
+    packageLinks,
+  ].join("\n");
 
-	writeFileSync(indexPath, indexPage);
+  writeFileSync(indexPath, indexPage);
 }
