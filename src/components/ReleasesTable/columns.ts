@@ -1,8 +1,9 @@
 import { type ColumnDef, createColumnHelper } from "@tanstack/vue-table";
-import { format, isBefore, parseISO } from "date-fns";
+import { isBefore, parseISO } from "date-fns";
 import { useData } from "vitepress";
 import { h } from "vue";
 import type { TableData } from "../../../packages/releases-generator/types";
+import { formatReleaseDate } from "../releaseData";
 
 const strictIncludes = (row, columnId, filterValues: string[]) => {
   const cellValue = row.getValue(columnId);
@@ -27,12 +28,6 @@ const dateInRange = (row, columnId, filterValue) => {
   return true;
 };
 
-function formatDate(val) {
-  if (!val || val === "-") return "-";
-  const date = parseISO(val);
-  return format(date, "MMMM d, yyyy");
-}
-
 export function createColumns(showChangelogPopup) {
   const columnHelper = createColumnHelper<TableData>();
   const columns: ColumnDef<TableData, string>[] = [
@@ -50,7 +45,7 @@ export function createColumns(showChangelogPopup) {
 
     columnHelper.accessor("date", {
       header: "Release Date",
-      cell: (info) => formatDate(info.getValue()),
+      cell: (info) => formatReleaseDate(info.getValue()),
       enableColumnFilter: true,
       filterFn: dateInRange,
     }),

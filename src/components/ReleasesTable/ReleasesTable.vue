@@ -6,20 +6,12 @@ import {
   useVueTable,
 } from "@tanstack/vue-table";
 import { subMonths } from "date-fns";
-import { withBase } from "vitepress";
 import { computed, onMounted, ref, watch } from "vue";
-import type {
-  TableData,
-  TableMetadata,
-} from "../../../packages/releases-generator/types";
+import type { TableData } from "../../../packages/releases-generator/types";
+import { loadReleaseData } from "../releaseData";
 // biome-ignore lint/correctness/noUnusedImports: Used by the Vue template.
 import ChangelogDialog from "./ChangelogDialog.vue";
 import { createColumns } from "./columns";
-
-interface TableDataPayload {
-  tableMetadata: TableMetadata;
-  tableData: TableData[];
-}
 
 const repoList = ref<string[]>([]);
 const packages = ref<Record<string, string[]>>({});
@@ -62,7 +54,7 @@ const activeFilterCount = computed(() => {
     count += 1;
   }
 
-  if (filterDate.value && filterDate.value !== lastMonthIso) {
+  if (filterDate.value !== lastMonthIso) {
     count += 1;
   }
 
@@ -124,18 +116,14 @@ watch(selectedProjects, (newProjects) => {
 watch(
   filterDate,
   (since) => {
-    table.getColumn("date")?.setFilterValue(since);
+    table.getColumn("date")?.setFilterValue(since ?? undefined);
   },
   { immediate: true },
 );
 
 onMounted(async () => {
   try {
-    const response = await fetch(withBase("/tableData.json"));
-    if (!response.ok) {
-      throw new Error(`Failed to load release data: ${response.statusText}`);
-    }
-    const payload = (await response.json()) as TableDataPayload;
+    const payload = await loadReleaseData();
     repoList.value = payload.tableMetadata.repoList;
     packages.value = payload.tableMetadata.packages;
     data.value = payload.tableData;
@@ -153,7 +141,7 @@ onMounted(async () => {
 <template>
   <div class="vp-raw releases-table">
     <p v-if="isLoading" class="table-state table-state-loading">
-      Loading release data...
+      Loading...
     </p>
     <p v-else-if="loadError" class="table-state table-state-error">
       {{ loadError }}
@@ -207,9 +195,9 @@ onMounted(async () => {
       </v-row>
 
       <div v-if="!hasResults" class="table-empty">
-        <p class="table-empty-title">No releases match these filters.</p>
+        <p class="table-empty-title">No matching releases.</p>
         <p class="table-empty-body">
-          Try widening the date range or resetting the repository and project filters.
+          Widen the date range or reset filters.
         </p>
         <v-btn variant="outlined" @click="resetFilters">Reset filters</v-btn>
       </div>
@@ -246,6 +234,9 @@ onMounted(async () => {
 
 <style scoped>
 .releases-table {
+  width: 100%;
+  margin: 0;
+  padding: 0;
   color: var(--vp-c-text-1);
 }
 

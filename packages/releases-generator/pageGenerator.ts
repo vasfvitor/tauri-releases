@@ -2,11 +2,7 @@ import { createWriteStream, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { baseDir } from "./config.js";
 import { parseAndSortChangelog } from "./scripts/parse.js";
-import {
-  getAllVersionsHead,
-  writeIndexPage,
-  writeVersionPage,
-} from "./scripts/writePage.js";
+import { getAllVersionsHead, writeVersionPage } from "./scripts/writePage.js";
 import type { PackageData, TableMetadata } from "./types.js";
 import { parseMarkdown } from "./utils.js";
 
@@ -24,12 +20,8 @@ export function writePageData(
   packageData: PackageData,
   outputDir: string = baseDir,
 ): void {
-  const packageNames: string[] = [];
-
   Object.entries(packageData).forEach(([packageName, data]) => {
     const fullName = `${data.group || ""}/${packageName}`;
-
-    packageNames.push(fullName);
 
     const workingDir = join(outputDir, fullName);
     mkdirSync(workingDir, { recursive: true });
@@ -69,8 +61,6 @@ export function writePageData(
 
     allVersionsStream.end();
   });
-
-  writeIndexPage(packageNames);
 }
 
 export async function writeTableData(

@@ -1,7 +1,6 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { baseDir, note, repositories } from "../config.js";
-import { getSummaryTable } from "./summary.js";
+import { note } from "../config.js";
 
 /**
  * write an individual page for each version
@@ -49,37 +48,4 @@ export function getAllVersionsHead(packageName: string, url: string): string {
   const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
 
   return `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n\n${tags}`;
-}
-
-/**
- * write an index page with links to all packages
- */
-export function writeIndexPage(packages: string[]): void {
-  const indexPath = join(baseDir, "index.md");
-  mkdirSync(join(baseDir), { recursive: true });
-
-  const packageLinks = packages
-    .map((pkg) => `- [${pkg}](/${pkg}/all_versions.html)`)
-    .join("\n");
-
-  const summaryTable = getSummaryTable(repositories);
-
-  const indexPage = [
-    "---",
-    note,
-    `title: 'Tauri Releases'`,
-    `order: 1`,
-    `aside: false`,
-    "---",
-    "",
-    "# Tauri Releases",
-    "",
-    "## Packages",
-    "",
-    summaryTable,
-    "",
-    packageLinks,
-  ].join("\n");
-
-  writeFileSync(indexPath, indexPage);
 }
