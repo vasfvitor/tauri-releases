@@ -1,8 +1,8 @@
-import { JSDOM } from "jsdom";
-import createDOMPurify from "dompurify";
-import { marked } from "marked";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import createDOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
+import { marked } from "marked";
 
 const window = new JSDOM("").window;
 const DOMPurify = createDOMPurify(window);
@@ -10,13 +10,13 @@ const DOMPurify = createDOMPurify(window);
 export function parseMarkdown(
 	content: string,
 	type: "markdown" | "html" = "markdown",
-) {
+): string {
 	const hed = entitify(content);
 	if (type === "markdown") {
 		return hed;
 	}
 	if (type === "html") {
-		return DOMPurify.sanitize(marked(hed));
+		return DOMPurify.sanitize(marked(hed, { async: false }));
 	}
 	return "";
 }

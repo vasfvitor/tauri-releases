@@ -1,8 +1,8 @@
-import { createColumnHelper, type ColumnDef } from "@tanstack/vue-table";
+import { type ColumnDef, createColumnHelper } from "@tanstack/vue-table";
 import { format, isBefore, parseISO } from "date-fns";
+import { useData } from "vitepress";
 import { h } from "vue";
 import type { TableData } from "../../../packages/releases-generator/types";
-import { useData } from "vitepress";
 
 const strictIncludes = (row, columnId, filterValues: string[]) => {
 	const cellValue = row.getValue(columnId);
@@ -80,10 +80,9 @@ export function createColumns(showChangelogPopup) {
 				const isRoot = repo === name && repo !== "tauri";
 				const path = isRoot ? repo : `${repo}/${name}`;
 
-
 				const { site } = useData();
-				
-				let to = `/${path}/v${version}`
+
+				let to = `/${path}/v${version}`;
 				if (site.value.base) {
 					to = `${site.value.base}${to}`;
 				}
@@ -91,7 +90,7 @@ export function createColumns(showChangelogPopup) {
 				return h(
 					"a",
 					{
-						href:to ,
+						href: to,
 					},
 					"Link",
 				);

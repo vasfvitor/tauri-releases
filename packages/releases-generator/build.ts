@@ -1,10 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { fetchData } from "./dataFetch";
-import { repositories } from "./config";
-import { generatePagesAndTableData } from "./pageGenerator";
-import type { PackageData } from "./types";
-import { writeOutput } from "./utils";
+import { repositories } from "./config.js";
+import { fetchData } from "./dataFetch.js";
+import { generatePagesAndTableData } from "./pageGenerator.js";
+import type { PackageData } from "./types.js";
+import { writeOutput } from "./utils.js";
 
 async function buildSite() {
 	const dataFilePath = join("generated", "data.json");

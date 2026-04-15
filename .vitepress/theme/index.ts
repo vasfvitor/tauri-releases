@@ -1,5 +1,5 @@
-import type { Theme } from "vitepress";
 import { FlexRender } from "@tanstack/vue-table";
+import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 
 import { createVuetify } from "vuetify";

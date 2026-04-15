@@ -1,9 +1,11 @@
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 import { defineConfig } from "vitepress";
 
 const srcDir = "src/content";
 
-const sidebarData = JSON.parse(readFileSync("src/content/public/sidebar.json", "utf-8"));
+const sidebarData = JSON.parse(
+	readFileSync("src/content/public/sidebar.json", "utf-8"),
+);
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -14,7 +16,7 @@ export default defineConfig({
 	themeConfig: {
 		sidebar: sidebarData,
 		siteTitle: false,
-		logo: { dark: '/logo.svg', light: '/logo_light.svg' },
+		logo: { dark: "/logo.svg", light: "/logo_light.svg" },
 		search: {
 			provider: "local",
 		},

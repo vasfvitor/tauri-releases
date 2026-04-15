@@ -1,4 +1,4 @@
-import type { repositories } from "./config";
+import type { repositories } from "./config.js";
 
 export type Repository = (typeof repositories)[0];
 export type RepoPackage = Repository["packages"][0];
@@ -42,6 +42,6 @@ export interface TableData {
 }
 
 export interface TableMetadata {
-	packages: Record<string, []>;
+	packages: Record<string, string[]>;
 	repoList: Array<string>;
 }

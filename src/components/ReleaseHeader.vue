@@ -1,10 +1,9 @@
 <script setup lang="ts">
-
-const back = () => history.back()
-
+// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
+const back = () => history.back();
 
 defineProps<{
-    githubRelease: string;
+	githubRelease: string;
 }>();
 </script>
 

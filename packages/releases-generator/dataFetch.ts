@@ -1,7 +1,7 @@
-import fetch from "make-fetch-happen";
 import { appendFileSync } from "node:fs";
+import fetch from "make-fetch-happen";
 
-import type { PackageData, Repository } from "./types";
+import type { PackageData, Repository } from "./types.js";
 
 const fetchWithCache = async (
 	url: string,
@@ -46,13 +46,15 @@ export async function fetchData(
 
 	for (const repo of repositories) {
 		for (const pkg of repo.packages) {
-			if (!data[pkg.name]) {
-				data[pkg.name] = {
+			let packageData = data[pkg.name];
+			if (!packageData) {
+				packageData = {
 					group: repo.packages.length > 1 ? repo.name : "",
 					changelogs: "",
 					npmData: { id: "", name: "", versions: {} },
 					cratesData: { id: "", name: "", versions: {} },
 				};
+				data[pkg.name] = packageData;
 			}
 
 			const { githubPath, npmPath, cratesPath } = pkg;
@@ -70,7 +72,7 @@ export async function fetchData(
 						: `${rawUrl}/${branch}/CHANGELOG.md`;
 
 					try {
-						data[pkg.name].changelogs = await fetchWithCache(
+						packageData.changelogs = await fetchWithCache(
 							githubUrl,
 							`changelogs/${pkg.name}`,
 						);
@@ -91,7 +93,7 @@ export async function fetchData(
 						delete versions.created;
 						delete versions.modified;
 
-						data[pkg.name].npmData = {
+						packageData.npmData = {
 							id: rawData._id,
 							name: rawData.name,
 							// object keyed by version - time
@@ -111,7 +113,7 @@ export async function fetchData(
 							`crates/${pkg.name}`,
 						);
 						const rawData = JSON.parse(cratesResponse);
-						data[pkg.name].cratesData = {
+						packageData.cratesData = {
 							id: rawData.crate.id,
 							name: rawData.crate.name,
 							versions: formatCrateVersion(rawData.versions || []),

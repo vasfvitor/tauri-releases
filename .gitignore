@@ -5,6 +5,8 @@ node_modules
 packages/releases-generator/.cache
 
 /.vitepress/.temp
+.vitepress/config.mts.timestamp-*.mjs
+sidebar.json
 
 # generated files
 src/content/create-tauri-app

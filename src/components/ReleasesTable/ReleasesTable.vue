@@ -1,87 +1,82 @@
 <script setup lang="ts">
 import {
-    getCoreRowModel,
-    useVueTable,
-    getFilteredRowModel,
-    type ColumnFiltersState,
-    FlexRender,
-} from '@tanstack/vue-table';
-import { ref, watch, computed } from 'vue';
+	type ColumnFiltersState,
+	getCoreRowModel,
+	getFilteredRowModel,
+	useVueTable,
+} from "@tanstack/vue-table";
+import { subMonths } from "date-fns";
+import { computed, ref, watch } from "vue";
+import sourceData from "../../../packages/releases-generator/generated/tableData.json";
+import type { TableData } from "../../../packages/releases-generator/types";
+// biome-ignore lint/correctness/noUnusedImports: Used by the Vue template.
+import ChangelogDialog from "./ChangelogDialog.vue";
+import { createColumns } from "./columns";
 
-import sourceData from '../../../packages/releases-generator/generated/tableData.json';
-import type { TableData } from '../../../packages/releases-generator/types';
-import { subMonths } from 'date-fns';
-import { createColumns } from './columns';
-import ChangelogDialog from './ChangelogDialog.vue';
-
-const { repoList, packages } = sourceData.tableMetadata
+const { repoList, packages } = sourceData.tableMetadata;
 
 const data = ref<TableData[]>(sourceData.tableData);
 
-
 // filters
 const lastMonth = subMonths(new Date(), 1);
-const filterDate = ref<string | null>(lastMonth.toISOString().split('T')[0]);
+const filterDate = ref<string | null>(lastMonth.toISOString().split("T")[0]);
 const columnFilters = ref<ColumnFiltersState>([]);
 const selectedRepo = ref<string>(repoList[0]);
 const selectedProjects = ref<string[]>([]);
 
 const filteredPackages = computed(() => {
-    return packages[selectedRepo.value] || [];
+	return packages[selectedRepo.value] || [];
 });
-
-
 
 // changelog dialog
 const dialogChangelogContent = ref<string | null>(null);
 const isChangelogVisible = ref(false);
 const showChangelogPopup = (content: string) => {
-    dialogChangelogContent.value = content;
-    isChangelogVisible.value = true;
+	dialogChangelogContent.value = content;
+	isChangelogVisible.value = true;
 };
-
 
 // table
 const table = useVueTable({
-    get data() {
-        return data.value;
-    },
-    columns: createColumns(showChangelogPopup),
-    state: {
-        get columnFilters() {
-            return columnFilters.value;
-        },
-
-    },
-    onColumnFiltersChange: (t) => {
-        columnFilters.value = typeof t === 'function'
-            ? t(columnFilters.value)
-            : t
-    },
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+	get data() {
+		return data.value;
+	},
+	columns: createColumns(showChangelogPopup),
+	state: {
+		get columnFilters() {
+			return columnFilters.value;
+		},
+	},
+	onColumnFiltersChange: (t) => {
+		columnFilters.value = typeof t === "function" ? t(columnFilters.value) : t;
+	},
+	getCoreRowModel: getCoreRowModel(),
+	getFilteredRowModel: getFilteredRowModel(),
 });
-
 
 // filters
-watch(selectedRepo, (newRepo) => {
-    table.getColumn('repo')?.setFilterValue(newRepo);
-    selectedProjects.value = [...filteredPackages.value];
-}, { immediate: true });
-
+watch(
+	selectedRepo,
+	(newRepo) => {
+		table.getColumn("repo")?.setFilterValue(newRepo);
+		selectedProjects.value = [...filteredPackages.value];
+	},
+	{ immediate: true },
+);
 
 watch(selectedProjects, (newProjects) => {
-    const col = table.getColumn('name');
-    if (col) {
-        col.setFilterValue(newProjects.length ? newProjects : undefined);
-    }
+	const col = table.getColumn("name");
+	if (col) {
+		col.setFilterValue(newProjects.length ? newProjects : undefined);
+	}
 });
-watch(filterDate, (since) => {
-    table.getColumn('date')?.setFilterValue(since);
-}, { immediate: true });
-
-
-
+watch(
+	filterDate,
+	(since) => {
+		table.getColumn("date")?.setFilterValue(since);
+	},
+	{ immediate: true },
+);
 </script>
 
 

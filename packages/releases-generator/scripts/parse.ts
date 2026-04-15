@@ -1,5 +1,5 @@
 import { rcompare } from "semver";
-import type { Release } from "../types";
+import type { Release } from "../types.js";
 
 export /**
  * Parse changelog content into individual releases

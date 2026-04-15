@@ -15,7 +15,8 @@
 	z-index: -1;
 	opacity: 0.7;
 	overflow: hidden;
-	background: linear-gradient(-90deg, var(---color-gray-6) 1px, transparent 1px),
+	background:
+		linear-gradient(-90deg, var(---color-gray-6) 1px, transparent 1px),
 		linear-gradient(var(---color-gray-6) 1px, transparent 1px),
 		linear-gradient(-90deg, var(---color-gray-6) 1px, transparent 1px),
 		linear-gradient(var(---color-gray-6) 1px, transparent 1px),
@@ -32,8 +33,15 @@
 			transparent 156px,
 			transparent 156px
 		), linear-gradient(var(---color-gray-6) 1px, transparent 1px), transparent;
-	background-size: 32px 32px, 32px 32px, 256px 256px, 256px 256px, 256px 256px,
-		256px 256px, 256px 256px, 256px 256px;
+	background-size:
+		32px 32px,
+		32px 32px,
+		256px 256px,
+		256px 256px,
+		256px 256px,
+		256px 256px,
+		256px 256px,
+		256px 256px;
 }
 
 /* Transition hero background grid smoothly to page background color. */
@@ -85,11 +93,9 @@
 		z-index: -1;
 		opacity: 0.4;
 		overflow: hidden;
-		background: linear-gradient(
-				-90deg,
-				var(---color-gray-4) 1px,
-				transparent 1px
-			), linear-gradient(var(---color-gray-4) 1px, transparent 1px),
+		background:
+			linear-gradient(-90deg, var(---color-gray-4) 1px, transparent 1px),
+			linear-gradient(var(---color-gray-4) 1px, transparent 1px),
 			linear-gradient(-90deg, var(---color-gray-4) 1px, transparent 1px),
 			linear-gradient(var(---color-gray-4) 1px, transparent 1px),
 			linear-gradient(
@@ -105,8 +111,15 @@
 				transparent 156px,
 				transparent 156px
 			), linear-gradient(var(---color-gray-5) 1px, transparent 1px), transparent;
-		background-size: 32px 32px, 32px 32px, 256px 256px, 256px 256px, 256px 256px,
-			256px 256px, 256px 256px, 256px 256px;
+		background-size:
+			32px 32px,
+			32px 32px,
+			256px 256px,
+			256px 256px,
+			256px 256px,
+			256px 256px,
+			256px 256px,
+			256px 256px;
 	}
 }
 
@@ -135,6 +148,8 @@
 	}
 
 	100% {
+		scale: 1;
+		opacity: 1;
 	}
 }
 

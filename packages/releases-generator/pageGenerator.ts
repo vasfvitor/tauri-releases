@@ -1,15 +1,14 @@
-import { mkdirSync } from "node:fs";
+import { createWriteStream, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { baseDir } from "./config";
-import { createWriteStream } from "node:fs";
-import { parseMarkdown } from "./utils";
-import type { PackageData, TableMetadata } from "./types";
+import { baseDir } from "./config.js";
+import { parseAndSortChangelog } from "./scripts/parse.js";
 import {
-	writeVersionPage,
-	writeIndexPage,
 	getAllVersionsHead,
-} from "./scripts/writePage";
-import { parseAndSortChangelog } from "./scripts/parse";
+	writeIndexPage,
+	writeVersionPage,
+} from "./scripts/writePage.js";
+import type { PackageData, TableMetadata } from "./types.js";
+import { parseMarkdown } from "./utils.js";
 
 export async function generatePagesAndTableData(
 	packageData: PackageData,

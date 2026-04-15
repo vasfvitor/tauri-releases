@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
-import { baseDir, note, repositories } from "../config";
 import { join } from "node:path";
-import { getSummaryTable } from "./summary";
+import { baseDir, note, repositories } from "../config.js";
+import { getSummaryTable } from "./summary.js";
 
 /**
  * write an individual page for each version
@@ -49,7 +49,6 @@ export function getAllVersionsHead(packageName: string, url: string): string {
 	const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
 
 	return `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n\n${tags}`;
-
 }
 
 /**

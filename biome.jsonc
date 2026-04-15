@@ -1,16 +1,26 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
 	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
 		"useIgnoreFile": false
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": [
+			"**",
+			"!.vitepress/cache/**",
+			"!.vitepress/dist/**",
+			"!.vitepress/.temp/**",
+			"!packages/releases-generator/generated/**",
+			"!src/content/**",
+			"!sidebar.json"
+		]
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "space",
+		"lineEnding": "lf"
 	},
 	"linter": {
 		"enabled": true,

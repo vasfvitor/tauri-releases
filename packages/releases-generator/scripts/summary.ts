@@ -1,4 +1,4 @@
-import type { Repository } from "../types";
+import type { Repository } from "../types.js";
 
 const cratesUrl = "https://crates.io/crates";
 const npmUrl = "https://www.npmjs.com/package";
