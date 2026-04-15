@@ -34,9 +34,51 @@ const columnFilters = ref<ColumnFiltersState>([]);
 const selectedRepo = ref<string>("");
 const selectedProjects = ref<string[]>([]);
 
+const defaultRepo = computed(() => repoList.value[0] ?? "");
+const defaultProjects = computed(() => packages.value[defaultRepo.value] ?? []);
+const lastMonthIso = lastMonth.toISOString().split("T")[0];
+
 const filteredPackages = computed(() => {
   return packages.value[selectedRepo.value] || [];
 });
+
+// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
+const totalRows = computed(() => data.value.length);
+const visibleRows = computed(() => table.getRowModel().rows.length);
+const activeFilterCount = computed(() => {
+  let count = 0;
+
+  if (selectedRepo.value && selectedRepo.value !== defaultRepo.value) {
+    count += 1;
+  }
+
+  const currentProjects =
+    selectedProjects.value.length === filteredPackages.value.length &&
+    selectedProjects.value.every((item) =>
+      filteredPackages.value.includes(item),
+    );
+
+  if (!currentProjects) {
+    count += 1;
+  }
+
+  if (filterDate.value && filterDate.value !== lastMonthIso) {
+    count += 1;
+  }
+
+  return count;
+});
+// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
+const hasActiveFilters = computed(() => activeFilterCount.value > 0);
+// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
+const hasResults = computed(() => visibleRows.value > 0);
+
+// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
+function resetFilters() {
+  selectedRepo.value = defaultRepo.value;
+  selectedProjects.value = [...defaultProjects.value];
+  filterDate.value = lastMonthIso;
+}
 
 // changelog dialog
 const dialogChangelogContent = ref<string | null>(null);
@@ -110,12 +152,34 @@ onMounted(async () => {
 
 <template>
   <div class="vp-raw releases-table">
-    <p v-if="isLoading" class="table-state">Loading release data...</p>
+    <p v-if="isLoading" class="table-state table-state-loading">
+      Loading release data...
+    </p>
     <p v-else-if="loadError" class="table-state table-state-error">
       {{ loadError }}
     </p>
     <template v-else>
-      <v-row>
+      <div class="table-toolbar">
+        <div class="table-summary">
+          <span class="table-summary-count">
+            {{ visibleRows }} of {{ totalRows }} releases
+          </span>
+          <span class="table-summary-detail">
+            {{ activeFilterCount }} active filter{{ activeFilterCount === 1 ? "" : "s" }}
+          </span>
+        </div>
+        <v-btn
+          v-if="hasActiveFilters"
+          class="table-reset"
+          variant="text"
+          size="small"
+          @click="resetFilters"
+        >
+          Reset filters
+        </v-btn>
+      </div>
+
+      <v-row class="table-filters">
         <v-col cols="12" sm="6">
           <v-select v-model="selectedRepo" :items="repoList" label="Repository" />
         </v-col>
@@ -132,14 +196,25 @@ onMounted(async () => {
             </template>
           </v-select>
         </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-text-field v-model="filterDate" type="date" label="Since" />
+        <v-col cols="12">
+          <v-text-field
+            v-model="filterDate"
+            class="table-date-filter"
+            type="date"
+            label="Since"
+          />
         </v-col>
       </v-row>
 
-      <v-table class="release-data-table" density="compact">
+      <div v-if="!hasResults" class="table-empty">
+        <p class="table-empty-title">No releases match these filters.</p>
+        <p class="table-empty-body">
+          Try widening the date range or resetting the repository and project filters.
+        </p>
+        <v-btn variant="outlined" @click="resetFilters">Reset filters</v-btn>
+      </div>
+
+      <v-table v-else class="release-data-table" density="compact">
         <thead>
           <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
             <th
@@ -174,16 +249,111 @@ onMounted(async () => {
   color: var(--vp-c-text-1);
 }
 
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.table-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 0.75rem;
+}
+
+.table-summary-count {
+  font-weight: 600;
+}
+
+.table-summary-detail {
+  color: var(--vp-c-text-2);
+  font-size: 0.95rem;
+}
+
+.table-filters {
+  margin-bottom: 0.75rem;
+}
+
+.table-date-filter {
+  max-width: 20rem;
+}
+
 .table-state {
   margin: 1rem 0;
   color: var(--vp-c-text-2);
+}
+
+.table-state-loading {
+  padding: 0.75rem 0;
 }
 
 .table-state-error {
   color: var(--vp-c-danger-1);
 }
 
+.table-empty {
+  padding: 1rem;
+  margin-top: 0.75rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--vp-c-bg-soft);
+}
+
+.table-empty-title {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+}
+
+.table-empty-body {
+  margin: 0 0 1rem;
+  color: var(--vp-c-text-2);
+}
+
 .release-data-table {
   background: transparent;
+  width: 100%;
+}
+
+.release-data-table :deep(.v-table__wrapper) {
+  width: 100%;
+}
+
+.release-data-table :deep(table) {
+  width: 100%;
+}
+
+.release-data-table :deep(thead th) {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--vp-c-bg);
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.release-data-table :deep(tbody tr:hover) {
+  background: var(--vp-c-bg-soft);
+}
+
+.release-data-table :deep(a) {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+}
+
+.release-data-table :deep(a:hover) {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .table-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .table-date-filter {
+    max-width: none;
+  }
 }
 </style>
