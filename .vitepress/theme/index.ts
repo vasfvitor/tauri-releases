@@ -40,7 +40,7 @@ const vuetify = createVuetify({
 });
 
 // import "./styles/theme.css";
-// import "./styles/custom.css";
+import "./styles/custom.css";
 import "vuetify/styles";
 
 export default {

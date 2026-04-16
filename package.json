@@ -9,7 +9,10 @@
     "build": "vitepress build",
     "build:releases": "pnpm --filter releases-generator run build",
     "docs:build": "pnpm build:releases && pnpm build",
-    "preview": "vitepress preview"
+    "preview": "vitepress preview",
+    "biome": "biome check .",
+    "lint": "biome lint --write .",
+    "format": "biome format --write ."
   },
   "keywords": [],
   "author": "",

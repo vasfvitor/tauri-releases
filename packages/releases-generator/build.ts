@@ -11,6 +11,7 @@ async function buildSite() {
   let packageData: PackageData;
 
   if (existsSync(dataFilePath)) {
+    console.log("Skipping versions fetch - data.json already exists");
     const rawData = readFileSync(dataFilePath, "utf-8");
     packageData = JSON.parse(rawData);
   } else {

@@ -1,21 +1,9 @@
 <script setup lang="ts">
 import { withBase } from "vitepress";
+import { buildPackageGroupLinks } from "../../packages/releases-generator/uiData";
+import { repositories } from "../../packages/releases-generator/config";
 
-type PackageLink = {
-  name: string;
-  href: string;
-};
-
-const packageLinks: PackageLink[] = [
-  { name: "Tauri", href: withBase("/tauri/tauri/all_versions.html") },
-  { name: "Wry", href: withBase("/wry/all_versions.html") },
-  { name: "Tao", href: withBase("/tao/all_versions.html") },
-  { name: "CTA", href: withBase("/create-tauri-app/all_versions.html") },
-  {
-    name: "Plugins",
-    href: withBase("/plugins-workspace/autostart/all_versions.html"),
-  },
-];
+const packageLinks = buildPackageGroupLinks(repositories);
 </script>
 
 <template>
@@ -24,7 +12,7 @@ const packageLinks: PackageLink[] = [
       v-for="group in packageLinks"
       :key="group.href"
       class="package-link"
-      :href="group.href"
+      :href="withBase(group.href)"
     >
       {{ group.name }}
     </a>

@@ -35,5 +35,5 @@ export function loadReleaseData() {
 
 export function formatReleaseDate(value: string | undefined | null) {
   if (!value || value === "-") return "-";
-  return format(parseISO(value), "MMMM d, yyyy");
+  return format(parseISO(value), "MMM d, yyyy");
 }

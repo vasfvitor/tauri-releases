@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   type ColumnFiltersState,
+  type ColumnVisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
   useVueTable,
@@ -12,17 +13,26 @@ import { loadReleaseData } from "../releaseData";
 // biome-ignore lint/correctness/noUnusedImports: Used by the Vue template.
 import ChangelogDialog from "./ChangelogDialog.vue";
 import { createColumns } from "./columns";
+import { buildMajorGroups, sortReleasesByDateDesc } from "./releaseRows";
 
 const repoList = ref<string[]>([]);
 const packages = ref<Record<string, string[]>>({});
 const data = ref<TableData[]>([]);
 const isLoading = ref(true);
 const loadError = ref<string | null>(null);
+// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
+const viewMode = ref<"date" | "major">("date");
+// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
+const viewModes = [
+  { title: "By date", value: "date" },
+  { title: "By major", value: "major" },
+];
 
 // filters
 const lastMonth = subMonths(new Date(), 1);
 const filterDate = ref<string | null>(lastMonth.toISOString().split("T")[0]);
 const columnFilters = ref<ColumnFiltersState>([]);
+const columnVisibility = ref<ColumnVisibilityState>({ date: false });
 const selectedRepo = ref<string>("");
 const selectedProjects = ref<string[]>([]);
 
@@ -33,10 +43,23 @@ const lastMonthIso = lastMonth.toISOString().split("T")[0];
 const filteredPackages = computed(() => {
   return packages.value[selectedRepo.value] || [];
 });
+const sortedData = computed(() => sortReleasesByDateDesc(data.value));
 
 // biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
 const totalRows = computed(() => data.value.length);
 const visibleRows = computed(() => table.getRowModel().rows.length);
+// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
+const majorGroups = computed(() => {
+  const rows = table.getRowModel().rows;
+  const rowByRelease = new Map(rows.map((row) => [row.original, row]));
+
+  return buildMajorGroups(rows.map((row) => row.original)).map((group) => ({
+    label: group.label,
+    rows: group.rows
+      .map((release) => rowByRelease.get(release))
+      .filter((row) => row !== undefined),
+  }));
+});
 const activeFilterCount = computed(() => {
   let count = 0;
 
@@ -83,12 +106,15 @@ const showChangelogPopup = (content: string) => {
 // table
 const table = useVueTable({
   get data() {
-    return data.value;
+    return sortedData.value;
   },
   columns: createColumns(showChangelogPopup),
   state: {
     get columnFilters() {
       return columnFilters.value;
+    },
+    get columnVisibility() {
+      return columnVisibility.value;
     },
   },
   onColumnFiltersChange: (t) => {
@@ -167,10 +193,10 @@ onMounted(async () => {
       </div>
 
       <v-row class="table-filters">
-        <v-col cols="12" sm="6">
+        <v-col cols="12" sm="4">
           <v-select v-model="selectedRepo" :items="repoList" label="Repository" />
         </v-col>
-        <v-col cols="12" sm="6">
+        <v-col cols="12" sm="4">
           <v-select
             v-model="selectedProjects"
             :items="filteredPackages"
@@ -182,6 +208,9 @@ onMounted(async () => {
               <span v-if="index === 2">(+{{ selectedProjects.length - 2 }})</span>
             </template>
           </v-select>
+        </v-col>
+        <v-col cols="12" sm="4">
+          <v-select v-model="viewMode" :items="viewModes" label="View" />
         </v-col>
         <v-col cols="12">
           <v-text-field
@@ -217,12 +246,26 @@ onMounted(async () => {
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="viewMode === 'date'">
           <tr v-for="row in table.getRowModel().rows" :key="row.id">
             <td v-for="cell in row.getVisibleCells()" :key="cell.id">
               <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
             </td>
           </tr>
+        </tbody>
+        <tbody v-else>
+          <template v-for="group in majorGroups" :key="group.label">
+            <tr class="release-major-row">
+              <td :colspan="table.getVisibleFlatColumns().length">
+                {{ group.label }}
+              </td>
+            </tr>
+            <tr v-for="row in group.rows" :key="row.id">
+              <td v-for="cell in row.getVisibleCells()" :key="cell.id">
+                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+              </td>
+            </tr>
+          </template>
         </tbody>
       </v-table>
     </template>
@@ -321,6 +364,31 @@ onMounted(async () => {
 }
 
 .release-data-table :deep(tbody tr:hover) {
+  background: var(--vp-c-bg-soft);
+}
+
+.release-data-table :deep(.release-version) {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.release-data-table :deep(.release-version-number) {
+  font-weight: 600;
+}
+
+.release-data-table :deep(.release-version-date) {
+  color: var(--vp-c-text-2);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.release-major-row td {
+  color: var(--vp-c-text-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0;
   background: var(--vp-c-bg-soft);
 }
 

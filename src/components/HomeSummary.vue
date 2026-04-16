@@ -1,52 +1,9 @@
 <script setup lang="ts">
 import { repositories } from "../../packages/releases-generator/config";
+import { buildHomeSummaryRepos } from "../../packages/releases-generator/uiData";
+import { latestVersions } from "../../packages/releases-generator/generated/latestVersions";
 
-const registries = [
-  {
-    label: "crate",
-    field: "cratesPath" as const,
-    pageUrl: "https://crates.io/crates",
-    badgeUrl: "https://img.shields.io/crates/v",
-    alt: "crates.io version",
-    normalize: (path: string) => path.split("/").pop() ?? path,
-  },
-  {
-    label: "npm",
-    field: "npmPath" as const,
-    pageUrl: "https://www.npmjs.com/package",
-    badgeUrl: "https://img.shields.io/npm/v",
-    alt: "npm version",
-    normalize: (path: string) => path,
-  },
-];
-
-const renderedRepos = repositories.map((repo) => ({
-  displayName: repo.displayName,
-  repoUrl: repo.repoUrl,
-  repoSlug: repo.repoUrl.replace("https://github.com/", "").replace(/\/$/, ""),
-  packages: repo.packages.map((pkg) => {
-    const entries = registries.flatMap((reg) => {
-      const path = (pkg as Record<string, string | undefined>)[reg.field];
-      if (!path) return [];
-      const slug = reg.normalize(path);
-      return [
-        {
-          link: {
-            label: `${pkg.name} (${reg.label})`,
-            href: `${reg.pageUrl}/${slug}`,
-          },
-          badge: { alt: reg.alt, src: `${reg.badgeUrl}/${slug}.svg` },
-        },
-      ];
-    });
-
-    return {
-      description: pkg.description,
-      links: entries.map((e) => e.link),
-      badges: entries.map((e) => e.badge),
-    };
-  }),
-}));
+const renderedRepos = buildHomeSummaryRepos(repositories, latestVersions);
 </script>
 
 <template>
@@ -73,13 +30,20 @@ const renderedRepos = repositories.map((repo) => ({
             <td class="component-cell">
               <a v-for="link in pkg.links" :key="link.href" class="component-link" :href="link.href" target="_blank"
                 rel="noreferrer">
-                {{ link.label }}
+                {{ link.name }}
               </a>
             </td>
             <td class="description-cell">{{ pkg.description }}</td>
             <td class="version-cell">
-              <img v-for="badge in pkg.badges" :key="badge.src" class="version-badge" :src="badge.src" :alt="badge.alt"
-                loading="lazy" decoding="async" />
+              <span
+                v-for="pill in pkg.versions"
+                :key="`${pill.label}-${pill.version}`"
+                class="version-pill"
+                :class="`version-pill--${pill.label}`"
+              >
+                <span class="version-pill__label">{{ pill.label }}</span>
+                <span class="version-pill__value">{{ pill.version }}</span>
+              </span>
             </td>
           </tr>
         </tbody>
@@ -186,12 +150,38 @@ const renderedRepos = repositories.map((repo) => ({
   min-width: 16rem;
 }
 
-.version-badge {
-  display: block;
-  height: 20px;
+.version-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.35rem;
+  overflow: hidden;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+  margin-right: 0.35rem;
+  margin-bottom: 0.2rem;
+  border: 1px solid var(--vp-c-divider);
 }
 
-.version-badge+.version-badge {
-  margin-top: 0.25rem;
+.version-pill__label,
+.version-pill__value {
+  padding: 0.35rem 0.5rem;
+}
+
+.version-pill__label {
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.version-pill__value {
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+}
+
+.version-pill--npm .version-pill__value {
+  background: var(--vp-c-green-soft);
+  color: var(--vp-c-green-1);
 }
 </style>

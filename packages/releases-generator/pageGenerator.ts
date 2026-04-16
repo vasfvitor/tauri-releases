@@ -2,9 +2,26 @@ import { createWriteStream, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { baseDir } from "./config.js";
 import { parseAndSortChangelog } from "./scripts/parse.js";
-import { getAllVersionsHead, writeVersionPage } from "./scripts/writePage.js";
-import type { PackageData, TableMetadata } from "./types.js";
+import {
+  getAllVersionsHead,
+  renderReleaseDateLabel,
+  writeVersionPage,
+} from "./scripts/writePage.js";
+import type { PackageData, Release, TableMetadata } from "./types.js";
 import { parseMarkdown } from "./utils.js";
+import { writeLatestVersions } from "./writeLatestVersions.js";
+
+type ReleaseWithDate = Release & {
+  date: string | "-";
+  dateLabel?: string;
+};
+
+const releaseDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
 
 export async function generatePagesAndTableData(
   packageData: PackageData,
@@ -14,6 +31,7 @@ export async function generatePagesAndTableData(
   await writeTableData(packageData, outputDir);
   console.log("generating pages...");
   writePageData(packageData, outputDir);
+  writeLatestVersions(packageData);
 }
 
 export function writePageData(
@@ -29,7 +47,10 @@ export function writePageData(
     if (!data.changelogs) {
       console.warn(`missing changelog ${packageName}`);
     }
-    const releases = parseAndSortChangelog(data.changelogs);
+    const releases = withReleaseDates(
+      parseAndSortChangelog(data.changelogs),
+      data,
+    );
     if (releases.length === 0) {
       console.warn(`missing releases ${packageName}`);
     }
@@ -43,15 +64,18 @@ export function writePageData(
     allVersionsStream.write(getAllVersionsHead(packageName, url));
 
     releases.forEach((release, i) => {
-      const { version, notes } = release;
+      const { version, notes, dateLabel } = release;
       const rawMd = parseMarkdown(notes, "markdown");
 
-      allVersionsStream.write(`\n\n## v${version}\n\n${rawMd}`);
+      allVersionsStream.write(
+        `\n\n## v${version}${renderReleaseDateLabel(dateLabel)}\n\n${rawMd}`,
+      );
 
       writeVersionPage({
         packageName,
         version,
         notes: rawMd,
+        ...(dateLabel ? { releaseDateLabel: dateLabel } : {}),
         // todo: fix tag url - should point either to the current release or the full changelog if the all version page
         tag: packageName,
         workingDir,
@@ -104,7 +128,10 @@ export async function writeTableData(
       console.warn(`missing changelog ${packageName}`);
     }
 
-    const releases = parseAndSortChangelog(data.changelogs);
+    const releases = withReleaseDates(
+      parseAndSortChangelog(data.changelogs),
+      data,
+    );
 
     if (releases.length === 0) {
       console.warn(`missing releases ${packageName}`);
@@ -115,24 +142,15 @@ export async function writeTableData(
         stream.write(",");
       }
 
-      const { version, notes } = release;
-      const { npmData, cratesData } = data;
+      const { version, notes, date } = release;
       const parsedMd = parseMarkdown(notes, "html");
-
-      let date: string | undefined;
-      if (npmData?.versions?.[version]) {
-        date = data.npmData.versions[version];
-      }
-      if (!date && cratesData?.versions?.[version]) {
-        date = data.cratesData.versions[version];
-      }
 
       const row = {
         name: packageName,
         repo,
         version,
         changelog: parsedMd,
-        date: date || "-",
+        date,
       };
       stream.write(JSON.stringify(row));
       isFirst = false;
@@ -141,4 +159,40 @@ export async function writeTableData(
   // close
   stream.write("]\n}");
   stream.end();
+}
+
+export function withReleaseDates(
+  releases: Release[],
+  data: PackageData[string],
+): ReleaseWithDate[] {
+  return releases.map((release) => {
+    const date = getReleaseDate(release.version, data);
+
+    if (date === "-") {
+      return { ...release, date };
+    }
+
+    return {
+      ...release,
+      date,
+      dateLabel: releaseDateFormatter.format(new Date(date)),
+    };
+  });
+}
+
+function getReleaseDate(
+  version: string,
+  data: PackageData[string],
+): string | "-" {
+  const npmDate = data.npmData?.versions?.[version];
+  if (npmDate) {
+    return npmDate;
+  }
+
+  const cratesDate = data.cratesData?.versions?.[version];
+  if (cratesDate) {
+    return cratesDate;
+  }
+
+  return "-";
 }

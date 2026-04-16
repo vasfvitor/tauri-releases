@@ -41,11 +41,22 @@ export function createColumns(showChangelogPopup) {
       filterFn: strictIncludes,
     }),
 
-    columnHelper.accessor("version", { header: "Version" }),
+    columnHelper.accessor("version", {
+      header: "Version",
+      cell: (info) => {
+        const date = formatReleaseDate(info.row.original.date);
+
+        return h("span", { class: "release-version" }, [
+          h("span", { class: "release-version-number" }, `v${info.getValue()}`),
+          date !== "-"
+            ? h("span", { class: "release-version-date" }, date)
+            : null,
+        ]);
+      },
+    }),
 
     columnHelper.accessor("date", {
       header: "Release Date",
-      cell: (info) => formatReleaseDate(info.getValue()),
       enableColumnFilter: true,
       filterFn: dateInRange,
     }),

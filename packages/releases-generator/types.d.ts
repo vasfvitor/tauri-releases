@@ -1,7 +1,18 @@
-import type { repositories } from "./config.js";
+export interface RepoPackage {
+  name: string;
+  githubPath: string;
+  description: string;
+  cratesPath?: string;
+  npmPath?: string;
+}
 
-export type Repository = (typeof repositories)[0];
-export type RepoPackage = Repository["packages"][0];
+export interface Repository {
+  name: string;
+  displayName: string;
+  repoUrl: string;
+  branch?: string;
+  packages: RepoPackage[];
+}
 
 export type Release = {
   version: string;

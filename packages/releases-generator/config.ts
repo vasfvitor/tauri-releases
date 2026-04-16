@@ -1,3 +1,5 @@
+import type { Repository } from "./types.js";
+
 export const note =
   "\n#### NOTE: This file is auto-generated in packages/releases-generator/build.ts";
 
@@ -305,4 +307,4 @@ export const repositories = [
       },
     ],
   },
-];
+] satisfies Repository[];

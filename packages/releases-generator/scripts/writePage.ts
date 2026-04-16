@@ -9,12 +9,21 @@ export function writeVersionPage(params: {
   packageName: string;
   version: string;
   notes: string;
+  releaseDateLabel?: string;
   // todo: fix tag url
   tag: string;
   workingDir: string;
   order: number;
 }): void {
-  const { packageName, version, notes, tag, workingDir, order } = params;
+  const {
+    packageName,
+    version,
+    notes,
+    releaseDateLabel,
+    tag,
+    workingDir,
+    order,
+  } = params;
   const pageFrontmatter = [
     note,
     `title: '${packageName}@${version}'`,
@@ -26,12 +35,21 @@ export function writeVersionPage(params: {
   const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
   const header = `<ReleaseHeader githubRelease="${tag}/${packageName}-v${version}" />`;
 
+  const date = renderReleaseDateLabel(releaseDateLabel);
   const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
 
   const content = `${frontmatter}\n\n${header}\n\n${tags}\n\n${notes}`;
   const fileName = `v${version}.md`;
 
   writeFileSync(join(workingDir, fileName), content);
+}
+
+export function renderReleaseDateLabel(date: string | undefined): string {
+  if (!date) {
+    return "";
+  }
+
+  return `<small class="release-date">${date}</small>`;
 }
 
 export function getAllVersionsHead(packageName: string, url: string): string {
