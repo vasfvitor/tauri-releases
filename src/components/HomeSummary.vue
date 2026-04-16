@@ -1,60 +1,50 @@
 <script setup lang="ts">
 import { repositories } from "../../packages/releases-generator/config";
 
-const cratesUrl = "https://crates.io/crates";
-const npmUrl = "https://www.npmjs.com/package";
-const shieldUrl = "https://img.shields.io";
+const registries = [
+  {
+    label: "crate",
+    field: "cratesPath" as const,
+    pageUrl: "https://crates.io/crates",
+    badgeUrl: "https://img.shields.io/crates/v",
+    alt: "crates.io version",
+    normalize: (path: string) => path.split("/").pop() ?? path,
+  },
+  {
+    label: "npm",
+    field: "npmPath" as const,
+    pageUrl: "https://www.npmjs.com/package",
+    badgeUrl: "https://img.shields.io/npm/v",
+    alt: "npm version",
+    normalize: (path: string) => path,
+  },
+];
 
-type RenderedLink = { label: string; href: string };
-type RenderedBadge = { alt: string; src: string };
-type RenderedPackage = {
-  description: string;
-  links: RenderedLink[];
-  badges: RenderedBadge[];
-};
-type RenderedRepo = {
-  displayName: string;
-  repoUrl: string;
-  repoSlug: string;
-  packages: RenderedPackage[];
-};
-
-const renderedRepos: RenderedRepo[] = repositories.map((repo) => ({
+const renderedRepos = repositories.map((repo) => ({
   displayName: repo.displayName,
   repoUrl: repo.repoUrl,
   repoSlug: repo.repoUrl.replace("https://github.com/", "").replace(/\/$/, ""),
   packages: repo.packages.map((pkg) => {
-    const links: RenderedLink[] = [];
-    const badges: RenderedBadge[] = [];
-    const { cratesPath, npmPath } = pkg as {
-      cratesPath?: string;
-      npmPath?: string;
+    const entries = registries.flatMap((reg) => {
+      const path = (pkg as Record<string, string | undefined>)[reg.field];
+      if (!path) return [];
+      const slug = reg.normalize(path);
+      return [
+        {
+          link: {
+            label: `${pkg.name} (${reg.label})`,
+            href: `${reg.pageUrl}/${slug}`,
+          },
+          badge: { alt: reg.alt, src: `${reg.badgeUrl}/${slug}.svg` },
+        },
+      ];
+    });
+
+    return {
+      description: pkg.description,
+      links: entries.map((e) => e.link),
+      badges: entries.map((e) => e.badge),
     };
-
-    if (cratesPath) {
-      const crate = cratesPath.split("/").pop();
-      links.push({
-        label: `${pkg.name} (crate)`,
-        href: `${cratesUrl}/${crate}`,
-      });
-      badges.push({
-        alt: "crates.io version",
-        src: `${shieldUrl}/crates/v/${crate}.svg`,
-      });
-    }
-
-    if (npmPath) {
-      links.push({
-        label: `${pkg.name} (npm)`,
-        href: `${npmUrl}/${npmPath}`,
-      });
-      badges.push({
-        alt: "npm version",
-        src: `${shieldUrl}/npm/v/${npmPath}.svg`,
-      });
-    }
-
-    return { description: pkg.description, links, badges };
   }),
 }));
 </script>
@@ -63,7 +53,7 @@ const renderedRepos: RenderedRepo[] = repositories.map((repo) => ({
   <section class="home-summary">
     <article v-for="repo in renderedRepos" :key="repo.displayName" class="repo-block">
       <h3 class="repo-heading">
-        <span>{{ repo.displayName }}</span>
+        {{ repo.displayName }}
         <a class="repo-slug" :href="repo.repoUrl" target="_blank" rel="noreferrer">
           {{ repo.repoSlug }}
         </a>
@@ -89,7 +79,7 @@ const renderedRepos: RenderedRepo[] = repositories.map((repo) => ({
             <td class="description-cell">{{ pkg.description }}</td>
             <td class="version-cell">
               <img v-for="badge in pkg.badges" :key="badge.src" class="version-badge" :src="badge.src" :alt="badge.alt"
-                loading="lazy" />
+                loading="lazy" decoding="async" />
             </td>
           </tr>
         </tbody>

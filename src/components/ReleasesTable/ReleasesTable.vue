@@ -54,7 +54,7 @@ const activeFilterCount = computed(() => {
     count += 1;
   }
 
-  if (filterDate.value !== lastMonthIso) {
+  if (filterDate.value && filterDate.value !== lastMonthIso) {
     count += 1;
   }
 
@@ -136,7 +136,6 @@ onMounted(async () => {
   }
 });
 </script>
-
 
 <template>
   <div class="vp-raw releases-table">
@@ -234,9 +233,6 @@ onMounted(async () => {
 
 <style scoped>
 .releases-table {
-  width: 100%;
-  margin: 0;
-  padding: 0;
   color: var(--vp-c-text-1);
 }
 
