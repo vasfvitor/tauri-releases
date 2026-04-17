@@ -28,7 +28,6 @@ interface PackageConfig {
   repo: Repository;
   pkg: RepoPackage;
   changelogUrl: string;
-  tagBase: string;
 }
 
 const releaseDateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -38,8 +37,22 @@ const releaseDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-const scopedNameToTag = (name: string) =>
-  name.replace(/^@/, "").replace(/\//g, "-");
+function getGitHubReleaseTagBase(repo: Repository, pkg: RepoPackage): string {
+  if (repo.name === "plugins-workspace") {
+    return pkg.name;
+  }
+
+  return pkg.cratesPath || pkg.npmPath || pkg.name;
+}
+
+function buildGitHubReleaseUrl(
+  repo: Repository,
+  pkg: RepoPackage,
+  version: string,
+): string {
+  const tagBase = encodeURIComponent(getGitHubReleaseTagBase(repo, pkg));
+  return `${repo.repoUrl}/releases/tag/${tagBase}-v${version}`;
+}
 
 const packageConfigs = new Map<string, PackageConfig>();
 for (const repo of repositories) {
@@ -49,13 +62,10 @@ for (const repo of repositories) {
       pkg.githubPath === "__root__"
         ? "CHANGELOG.md"
         : `${pkg.githubPath}/CHANGELOG.md`;
-    const tagBase =
-      pkg.cratesPath || scopedNameToTag(pkg.npmPath ?? pkg.name);
     packageConfigs.set(pkg.name, {
       repo,
       pkg,
       changelogUrl: `${repo.repoUrl}/blob/${branch}/${path}`,
-      tagBase,
     });
   }
 }
@@ -104,8 +114,6 @@ export function writePageData(
     const releases = releasesByPackage.get(packageName) ?? [];
     const config = packageConfigs.get(packageName);
     const changelogUrl = config?.changelogUrl;
-    const tagBase = config?.tagBase;
-    const repoUrl = config?.repo.repoUrl;
 
     const allVersionsStream = createWriteStream(
       join(workingDir, "all_versions.md"),
@@ -122,10 +130,9 @@ export function writePageData(
       const content = [heading, releaseDateLabel, rawMd].filter(Boolean).join("\n\n");
       allVersionsStream.write(content);
 
-      const releaseUrl =
-        tagBase && repoUrl
-          ? `${repoUrl}/releases/tag/${tagBase}-v${version}`
-          : changelogUrl;
+      const releaseUrl = config
+        ? buildGitHubReleaseUrl(config.repo, config.pkg, version)
+        : changelogUrl;
 
       writeVersionPage({
         packageName,
