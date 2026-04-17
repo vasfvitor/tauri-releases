@@ -10,7 +10,7 @@ export function writeVersionPage(params: {
   version: string;
   notes: string;
   releaseDateLabel?: string;
-  githubReleaseUrl: string;
+  githubReleaseUrl?: string;
   workingDir: string;
   order: number;
 }): void {
@@ -32,15 +32,18 @@ export function writeVersionPage(params: {
   ];
 
   const frontmatter = ["---", ...pageFrontmatter, "---"].join("\n");
-  const header = `<ReleaseHeader href="${githubReleaseUrl}" />`;
+  const header = renderReleaseHeader(githubReleaseUrl);
 
   const date = renderReleaseDateLabel(releaseDateLabel);
-  const tags = [`# {{ $frontmatter.title }}${date}`].join("\n\n");
-
-  const content = `${frontmatter}\n\n${header}\n\n${tags}\n\n${notes}`;
+  const heading = `# {{ $frontmatter.title }}`;
+  const content = [frontmatter, header, heading, date, notes].filter(Boolean).join("\n\n");
   const fileName = `v${version}.md`;
 
   writeFileSync(join(workingDir, fileName), content);
+}
+
+function renderReleaseHeader(href: string | undefined): string {
+  return href ? `<ReleaseHeader href="${href}" />` : "<ReleaseHeader />";
 }
 
 export function renderReleaseDateLabel(date: string | undefined): string {
@@ -48,12 +51,12 @@ export function renderReleaseDateLabel(date: string | undefined): string {
     return "";
   }
 
-  return ` <small class="release-date">${date}</small>`;
+  return `<div class="release-date-row"><small class="release-date">${date}</small></div>`;
 }
 
 export function getAllVersionsHead(
   packageName: string,
-  githubUrl: string,
+  githubUrl: string | undefined,
 ): string {
   const frontmatter = [
     note,
@@ -63,8 +66,9 @@ export function getAllVersionsHead(
     "order: 0",
   ];
 
-  const header = `<ReleaseHeader href="${githubUrl}" />`;
-  const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
+  const header = renderReleaseHeader(githubUrl);
+  const heading = "# {{ $frontmatter.title }}";
+  const content = [header, heading].join("\n\n");
 
-  return `${["---", ...frontmatter, "---"].join("\n")}\n\n${header}\n\n${tags}`;
+  return `${["---", ...frontmatter, "---"].join("\n")}${content}\n\n`;
 }

@@ -7,7 +7,13 @@ import {
   renderReleaseDateLabel,
   writeVersionPage,
 } from "./scripts/writePage.js";
-import type { PackageData, Release, TableMetadata } from "./types.js";
+import type {
+  PackageData,
+  Release,
+  RepoPackage,
+  Repository,
+  TableMetadata,
+} from "./types.js";
 import { parseMarkdown } from "./utils.js";
 import { writeLatestVersions } from "./writeLatestVersions.js";
 
@@ -16,6 +22,15 @@ export type ReleaseWithDate = Release & {
   dateLabel?: string;
 };
 
+export type ReleasesByPackage = Map<string, ReleaseWithDate[]>;
+
+interface PackageConfig {
+  repo: Repository;
+  pkg: RepoPackage;
+  changelogUrl: string;
+  tagBase: string;
+}
+
 const releaseDateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
@@ -23,85 +38,43 @@ const releaseDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
-function getRepositoryForPackage(packageName: string) {
-  return repositories.find((repo) =>
-    repo.packages.some((pkg) => pkg.name === packageName),
-  );
-}
+const scopedNameToTag = (name: string) =>
+  name.replace(/^@/, "").replace(/\//g, "-");
 
-function getPackageConfig(packageName: string) {
-  const repo = getRepositoryForPackage(packageName);
-  if (!repo) {
-    return undefined;
-  }
-
-  const pkg = repo.packages.find((item) => item.name === packageName);
-  if (!pkg) {
-    return undefined;
-  }
-
-  return {
-    repo,
-    pkg,
-  };
-}
-
-function getChangelogUrl(packageName: string): string | undefined {
-  const config = getPackageConfig(packageName);
-  if (!config) {
-    return undefined;
-  }
-
-  const { repo, pkg } = config;
+const packageConfigs = new Map<string, PackageConfig>();
+for (const repo of repositories) {
   const branch = repo.branch || "dev";
-  const path =
-    pkg.githubPath === "__root__"
-      ? "CHANGELOG.md"
-      : `${pkg.githubPath}/CHANGELOG.md`;
-
-  return `${repo.repoUrl}/blob/${branch}/${path}`;
-}
-
-function getReleaseUrl(
-  packageName: string,
-  version: string,
-): string | undefined {
-  const config = getPackageConfig(packageName);
-  if (!config) {
-    return undefined;
+  for (const pkg of repo.packages) {
+    const path =
+      pkg.githubPath === "__root__"
+        ? "CHANGELOG.md"
+        : `${pkg.githubPath}/CHANGELOG.md`;
+    const tagBase =
+      pkg.cratesPath || scopedNameToTag(pkg.npmPath ?? pkg.name);
+    packageConfigs.set(pkg.name, {
+      repo,
+      pkg,
+      changelogUrl: `${repo.repoUrl}/blob/${branch}/${path}`,
+      tagBase,
+    });
   }
-
-  const { repo, pkg } = config;
-  const tagBase =
-    pkg.cratesPath ||
-    pkg.npmPath?.replace(/^@/, "").replace(/\//g, "-") ||
-    pkg.name.replace(/^@/, "").replace(/\//g, "-");
-  const tagName = `${tagBase}-v${version}`;
-
-  return `${repo.repoUrl}/releases/tag/${tagName}`;
 }
 
 export async function generatePagesAndTableData(
   packageData: PackageData,
   outputDir: string = baseDir,
 ) {
-  console.log("Generating table...");
-  await writeTableData(packageData, outputDir);
-  console.log("Generating pages...");
-  writePageData(packageData, outputDir);
-  writeLatestVersions(packageData);
+  const releasesByPackage = buildReleasesByPackage(packageData);
+  await writeTableData(packageData, releasesByPackage, outputDir);
+  writePageData(packageData, releasesByPackage, outputDir);
+  writeLatestVersions(packageData, releasesByPackage);
 }
 
-export function writePageData(
+export function buildReleasesByPackage(
   packageData: PackageData,
-  outputDir: string = baseDir,
-): void {
-  Object.entries(packageData).forEach(([packageName, data]) => {
-    const fullName = `${data.group || ""}/${packageName}`;
-
-    const workingDir = join(outputDir, fullName);
-    mkdirSync(workingDir, { recursive: true });
-
+): ReleasesByPackage {
+  const releasesByPackage: ReleasesByPackage = new Map();
+  for (const [packageName, data] of Object.entries(packageData)) {
     if (!data.changelogs) {
       console.warn(`missing changelog ${packageName}`);
     }
@@ -112,33 +85,54 @@ export function writePageData(
     if (releases.length === 0) {
       console.warn(`missing releases ${packageName}`);
     }
+    releasesByPackage.set(packageName, releases);
+  }
+  return releasesByPackage;
+}
+
+export function writePageData(
+  packageData: PackageData,
+  releasesByPackage: ReleasesByPackage,
+  outputDir: string = baseDir,
+): void {
+  Object.entries(packageData).forEach(([packageName, data]) => {
+    const fullName = `${data.group || ""}/${packageName}`;
+
+    const workingDir = join(outputDir, fullName);
+    mkdirSync(workingDir, { recursive: true });
+
+    const releases = releasesByPackage.get(packageName) ?? [];
+    const config = packageConfigs.get(packageName);
+    const changelogUrl = config?.changelogUrl;
+    const tagBase = config?.tagBase;
+    const repoUrl = config?.repo.repoUrl;
 
     const allVersionsStream = createWriteStream(
       join(workingDir, "all_versions.md"),
     );
 
-    const changelogUrl = getChangelogUrl(packageName);
-    allVersionsStream.write(
-      getAllVersionsHead(packageName, changelogUrl || "#"),
-    );
+    allVersionsStream.write(getAllVersionsHead(packageName, changelogUrl));
 
     releases.forEach((release, i) => {
       const { version, notes, dateLabel } = release;
       const rawMd = parseMarkdown(notes, "markdown");
 
+      const heading = `\n\n## v${version}\n\n`;
       const releaseDateLabel = renderReleaseDateLabel(dateLabel);
-      const heading = `## v${version}${releaseDateLabel}`;
+      const content = [heading, releaseDateLabel, rawMd].filter(Boolean).join("\n\n");
+      allVersionsStream.write(content);
 
-      allVersionsStream.write(`\n\n${heading}\n\n${rawMd}`);
-
-      const releaseUrl = getReleaseUrl(packageName, version);
+      const releaseUrl =
+        tagBase && repoUrl
+          ? `${repoUrl}/releases/tag/${tagBase}-v${version}`
+          : changelogUrl;
 
       writeVersionPage({
         packageName,
         version,
         notes: rawMd,
         ...(dateLabel ? { releaseDateLabel: dateLabel } : {}),
-        githubReleaseUrl: releaseUrl || changelogUrl || "#",
+        ...(releaseUrl ? { githubReleaseUrl: releaseUrl } : {}),
         workingDir,
         order: releases.length - i,
       });
@@ -150,6 +144,7 @@ export function writePageData(
 
 export async function writeTableData(
   packageData: PackageData,
+  releasesByPackage: ReleasesByPackage,
   outputDir: string = baseDir,
 ): Promise<void> {
   const tableMetadata: TableMetadata = {
@@ -172,7 +167,7 @@ export async function writeTableData(
       tableMetadata.packages[key] = [];
     }
     (tableMetadata.packages[key] as string[]).push(packageName);
-    repoList.add(data.group || packageName);
+    repoList.add(key);
   });
   tableMetadata.repoList = Array.from(repoList);
 
@@ -184,19 +179,7 @@ export async function writeTableData(
 
   for (const [packageName, data] of Object.entries(packageData)) {
     const repo = data.group || packageName;
-
-    if (!data.changelogs) {
-      console.warn(`missing changelog ${packageName}`);
-    }
-
-    const releases = withReleaseDates(
-      parseAndSortChangelog(data.changelogs),
-      data,
-    );
-
-    if (releases.length === 0) {
-      console.warn(`missing releases ${packageName}`);
-    }
+    const releases = releasesByPackage.get(packageName) ?? [];
 
     for (const release of releases) {
       if (!isFirst) {
@@ -211,7 +194,7 @@ export async function writeTableData(
         repo,
         version,
         changelog: parsedMd,
-        date,
+        ...(date ? { date } : {}),
       };
       stream.write(JSON.stringify(row));
       isFirst = false;

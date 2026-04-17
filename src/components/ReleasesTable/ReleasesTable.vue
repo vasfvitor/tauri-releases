@@ -21,12 +21,6 @@ const data = ref<TableData[]>([]);
 const isLoading = ref(true);
 const loadError = ref<string | null>(null);
 // biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
-const viewMode = ref<"date" | "major">("date");
-// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
-const viewModes = [
-  { title: "By date", value: "date" },
-  { title: "By major", value: "major" },
-];
 
 // filters
 const lastMonth = subMonths(new Date(), 1);
@@ -48,18 +42,7 @@ const sortedData = computed(() => sortReleasesByDateDesc(data.value));
 // biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
 const totalRows = computed(() => data.value.length);
 const visibleRows = computed(() => table.getRowModel().rows.length);
-// biome-ignore lint/correctness/noUnusedVariables: Used by the Vue template.
-const majorGroups = computed(() => {
-  const rows = table.getRowModel().rows;
-  const rowByRelease = new Map(rows.map((row) => [row.original, row]));
 
-  return buildMajorGroups(rows.map((row) => row.original)).map((group) => ({
-    label: group.label,
-    rows: group.rows
-      .map((release) => rowByRelease.get(release))
-      .filter((row) => row !== undefined),
-  }));
-});
 const activeFilterCount = computed(() => {
   let count = 0;
 
@@ -181,13 +164,7 @@ onMounted(async () => {
             {{ activeFilterCount }} active filter{{ activeFilterCount === 1 ? "" : "s" }}
           </span>
         </div>
-        <v-btn
-          v-if="hasActiveFilters"
-          class="table-reset"
-          variant="text"
-          size="small"
-          @click="resetFilters"
-        >
+        <v-btn v-if="hasActiveFilters" class="table-reset" variant="text" size="small" @click="resetFilters">
           Reset filters
         </v-btn>
       </div>
@@ -197,28 +174,16 @@ onMounted(async () => {
           <v-select v-model="selectedRepo" :items="repoList" label="Repository" />
         </v-col>
         <v-col cols="12" sm="4">
-          <v-select
-            v-model="selectedProjects"
-            :items="filteredPackages"
-            label="Projects"
-            multiple
-          >
+          <v-select v-model="selectedProjects" :items="filteredPackages" label="Projects" multiple>
             <template #selection="{ item, index }">
               <template v-if="index < 2">{{ item.title }}</template>
               <span v-if="index === 2">(+{{ selectedProjects.length - 2 }})</span>
             </template>
           </v-select>
         </v-col>
-        <v-col cols="12" sm="4">
-          <v-select v-model="viewMode" :items="viewModes" label="View" />
-        </v-col>
+
         <v-col cols="12">
-          <v-text-field
-            v-model="filterDate"
-            class="table-date-filter"
-            type="date"
-            label="Since"
-          />
+          <v-text-field v-model="filterDate" class="table-date-filter" type="date" label="Since" />
         </v-col>
       </v-row>
 
@@ -233,39 +198,18 @@ onMounted(async () => {
       <v-table v-else class="release-data-table" density="compact">
         <thead>
           <tr v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
-            <th
-              v-for="header in headerGroup.headers"
-              :key="header.id"
-              :colspan="header.colSpan"
-            >
-              <FlexRender
-                v-if="!header.isPlaceholder"
-                :render="header.column.columnDef.header"
-                :props="header.getContext()"
-              />
+            <th v-for="header in headerGroup.headers" :key="header.id" :colspan="header.colSpan">
+              <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header"
+                :props="header.getContext()" />
             </th>
           </tr>
         </thead>
-        <tbody v-if="viewMode === 'date'">
+        <tbody>
           <tr v-for="row in table.getRowModel().rows" :key="row.id">
             <td v-for="cell in row.getVisibleCells()" :key="cell.id">
               <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
             </td>
           </tr>
-        </tbody>
-        <tbody v-else>
-          <template v-for="group in majorGroups" :key="group.label">
-            <tr class="release-major-row">
-              <td :colspan="table.getVisibleFlatColumns().length">
-                {{ group.label }}
-              </td>
-            </tr>
-            <tr v-for="row in group.rows" :key="row.id">
-              <td v-for="cell in row.getVisibleCells()" :key="cell.id">
-                <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
-              </td>
-            </tr>
-          </template>
         </tbody>
       </v-table>
     </template>

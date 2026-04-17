@@ -1,14 +1,16 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { buildLatestVersions, formatLatestVersionsModule } from "./uiData.js";
+import type { ReleasesByPackage } from "./pageGenerator.js";
 import type { PackageData } from "./types.js";
+import { buildLatestVersions, formatLatestVersionsModule } from "./uiData.js";
 
 export function writeLatestVersions(
   packageData: PackageData,
+  releasesByPackage: ReleasesByPackage,
   outputDir = ".",
 ): void {
-  const latestVersions = buildLatestVersions(packageData);
+  const latestVersions = buildLatestVersions(packageData, releasesByPackage);
   const generatedDir = join(outputDir, "generated");
   mkdirSync(generatedDir, { recursive: true });
   writeFileSync(

@@ -1,4 +1,4 @@
-import { parseAndSortChangelog } from "./scripts/parse.js";
+import type { ReleasesByPackage } from "./pageGenerator.js";
 import type { PackageData, RepoPackage, Repository } from "./types.js";
 
 export interface LatestVersionsEntry {
@@ -108,12 +108,14 @@ export function buildPackageGroupLinks(repositories: Repository[]): PackageLink[
   });
 }
 
-export function buildLatestVersions(packageData: PackageData): LatestVersionsMap {
+export function buildLatestVersions(
+  packageData: PackageData,
+  releasesByPackage: ReleasesByPackage,
+): LatestVersionsMap {
   const latestVersions: LatestVersionsMap = {};
 
   for (const [packageName, data] of Object.entries(packageData)) {
-    const releases = parseAndSortChangelog(data.changelogs);
-    const latestRelease = releases[0]?.version;
+    const latestRelease = releasesByPackage.get(packageName)?.[0]?.version;
     if (!latestRelease) {
       continue;
     }
