@@ -8,6 +8,7 @@
     "dev": "vitepress dev",
     "build": "vitepress build",
     "build:releases": "pnpm --filter releases-generator run build",
+    "refresh:releases": "pnpm --filter releases-generator run refresh",
     "docs:build": "pnpm build:releases && pnpm build",
     "preview": "vitepress preview",
     "biome": "biome check .",
