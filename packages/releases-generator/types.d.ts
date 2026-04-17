@@ -49,7 +49,7 @@ export interface TableData {
   repo: string;
   version: string;
   changelog: RawMarkdown;
-  date: string | "-";
+  date?: string;
 }
 
 export interface TableMetadata {

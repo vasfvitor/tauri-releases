@@ -11,8 +11,8 @@ import type { PackageData, Release, TableMetadata } from "./types.js";
 import { parseMarkdown } from "./utils.js";
 import { writeLatestVersions } from "./writeLatestVersions.js";
 
-type ReleaseWithDate = Release & {
-  date: string | "-";
+export type ReleaseWithDate = Release & {
+  date?: string;
   dateLabel?: string;
 };
 
@@ -229,8 +229,8 @@ export function withReleaseDates(
   return releases.map((release) => {
     const date = getReleaseDate(release.version, data);
 
-    if (date === "-") {
-      return { ...release, date };
+    if (!date) {
+      return { ...release };
     }
 
     return {
@@ -244,7 +244,7 @@ export function withReleaseDates(
 function getReleaseDate(
   version: string,
   data: PackageData[string],
-): string | "-" {
+): string | undefined {
   const npmDate = data.npmData?.versions?.[version];
   if (npmDate) {
     return npmDate;
@@ -254,6 +254,5 @@ function getReleaseDate(
   if (cratesDate) {
     return cratesDate;
   }
-
-  return "-";
+  return undefined;
 }

@@ -33,7 +33,9 @@ export function loadReleaseData() {
   return releaseDataPromise;
 }
 
-export function formatReleaseDate(value: string | undefined | null) {
-  if (!value || value === "-") return "-";
+export function formatReleaseDate(
+  value: string | undefined | null,
+): string | undefined {
+  if (!value) return undefined;
   return format(parseISO(value), "MMM d, yyyy");
 }

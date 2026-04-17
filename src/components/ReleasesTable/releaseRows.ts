@@ -39,7 +39,7 @@ export function buildMajorGroups(rows: TableData[]): ReleaseMajorGroup[] {
 }
 
 function getDateTime(value: string | undefined): number {
-  if (!value || value === "-") {
+  if (!value) {
     return Number.NEGATIVE_INFINITY;
   }
 

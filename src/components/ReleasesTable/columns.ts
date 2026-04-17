@@ -15,17 +15,10 @@ const dateInRange = (row, columnId, filterValue) => {
     return true;
   }
   const cellValue = row.getValue(columnId);
-  if (!cellValue || cellValue === "-") {
+  if (!cellValue) {
     return false;
   }
-  const value = parseISO(cellValue);
-  const since = parseISO(filterValue);
-
-  if (isBefore(value, since)) {
-    return false;
-  }
-
-  return true;
+  return !isBefore(parseISO(cellValue), parseISO(filterValue));
 };
 
 export function createColumns(showChangelogPopup) {
@@ -48,9 +41,7 @@ export function createColumns(showChangelogPopup) {
 
         return h("span", { class: "release-version" }, [
           h("span", { class: "release-version-number" }, `v${info.getValue()}`),
-          date !== "-"
-            ? h("span", { class: "release-version-date" }, date)
-            : null,
+          date ? h("span", { class: "release-version-date" }, date) : null,
         ]);
       },
     }),
