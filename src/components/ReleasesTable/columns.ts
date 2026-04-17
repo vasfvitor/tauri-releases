@@ -88,7 +88,7 @@ export function createColumns(showChangelogPopup) {
 
         const { site } = useData();
 
-        let to = `/${path}/v${version}`;
+        let to = `${path}/v${version}`;
         if (site.value.base) {
           to = `${site.value.base}${to}`;
         }
