@@ -9,6 +9,7 @@ const fetchWithCache = async (
 ): Promise<string> => {
   const response = await fetch(url, {
     cachePath: `./.cache/${cacheDir}`,
+    cache: "no-cache",
   });
   if (!response.ok) {
     throw new Error(`Failed to fetch ${url}: ${response.statusText}`);

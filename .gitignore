@@ -3,6 +3,7 @@
 node_modules
 
 packages/releases-generator/.cache
+packages/releases-generator/success.log
 
 /.vitepress/.temp
 .vitepress/config.mts.timestamp-*.mjs

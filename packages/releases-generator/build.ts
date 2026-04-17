@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { repositories } from "./config.js";
 import { fetchData } from "./dataFetch.js";
@@ -10,21 +10,19 @@ async function buildSite() {
   const dataFilePath = join("generated", "data.json");
   let packageData: PackageData;
 
-  if (process.argv.includes("--refresh") || !existsSync(dataFilePath)) {
+  if (process.argv.includes("--refresh")) {
     packageData = await fetchData(repositories);
     writeOutput(packageData, "data.json");
   } else {
-    console.log("Skipping versions fetch - data.json already exists");
-    const rawData = readFileSync(dataFilePath, "utf-8");
-    packageData = JSON.parse(rawData);
+    try {
+      packageData = JSON.parse(readFileSync(dataFilePath, "utf-8"));
+      console.log("Skipping versions fetch - data.json already exists");
+    } catch (error) {
+      throw error;
+    }
   }
 
-  try {
-    await generatePagesAndTableData(packageData);
-  } catch (error) {
-    console.error(error);
-    process.exit(1);
-  }
+  await generatePagesAndTableData(packageData);
 }
 
 buildSite().catch((error) => {
