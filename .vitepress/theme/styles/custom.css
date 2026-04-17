@@ -2,3 +2,7 @@
   font-weight: 400;
   color: var(--vp-c-text-2);
 }
+
+.release-date-row {
+  line-height: 0.4;
+}

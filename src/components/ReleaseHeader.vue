@@ -3,24 +3,21 @@
 const back = () => history.back();
 
 defineProps<{
-  githubRelease: string;
+    href?: string;
 }>();
 </script>
 
 
 <template>
-    <div class="links-div">
+    <div :class="$style['links-div']">
         <span>
             <a href="#" @click.prevent="back">
                 <slot>Back</slot>
             </a>
         </span>
-        <!-- TODO: fix -->
-
-        <!-- <span>
-             format: https://github.com/tauri-apps/tauri/releases/tag/tauri-v2.6.1 for each version - or CHANGELOG.MD for the full changelog page
-            <a :href="githubRelease" target="_blank" rel="noopener">View on GitHub</a>
-        </span> -->
+        <span v-if="href">
+            <a :href="href" target="_blank" rel="noopener">View on GitHub</a>
+        </span>
     </div>
 </template>
 

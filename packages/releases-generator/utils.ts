@@ -41,7 +41,9 @@ export function entitify(str: string): string {
           return entity;
       }
     })
-    .replace(/\$\{/g, "$\\{");
+    .replace(/\$\{/g, "$\\{")
+    .replace(/\{\{/g, "&#123;&#123;")
+    .replace(/\}\}/g, "&#125;&#125;");
 }
 
 export function writeOutput(output: string | unknown, fileName: string): void {

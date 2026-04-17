@@ -49,7 +49,7 @@ export default {
     const { isDark } = useData();
 
     watchEffect(() => {
-      vuetify.theme.global.name.value = isDark.value ? "dark" : "light";
+      vuetify.theme.change(isDark.value ? "dark" : "light");
     });
   },
   enhanceApp({ app }) {

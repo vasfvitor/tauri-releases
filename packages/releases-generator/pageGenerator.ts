@@ -1,6 +1,6 @@
 import { createWriteStream, mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { baseDir } from "./config.js";
+import { baseDir, repositories } from "./config.js";
 import { parseAndSortChangelog } from "./scripts/parse.js";
 import {
   getAllVersionsHead,
@@ -23,13 +23,68 @@ const releaseDateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+function getRepositoryForPackage(packageName: string) {
+  return repositories.find((repo) =>
+    repo.packages.some((pkg) => pkg.name === packageName),
+  );
+}
+
+function getPackageConfig(packageName: string) {
+  const repo = getRepositoryForPackage(packageName);
+  if (!repo) {
+    return undefined;
+  }
+
+  const pkg = repo.packages.find((item) => item.name === packageName);
+  if (!pkg) {
+    return undefined;
+  }
+
+  return {
+    repo,
+    pkg,
+  };
+}
+
+function getChangelogUrl(packageName: string): string | undefined {
+  const config = getPackageConfig(packageName);
+  if (!config) {
+    return undefined;
+  }
+
+  const { repo, pkg } = config;
+  const branch = repo.branch || "dev";
+  const path =
+    pkg.githubPath === "__root__"
+      ? "CHANGELOG.md"
+      : `${pkg.githubPath}/CHANGELOG.md`;
+
+  return `${repo.repoUrl}/blob/${branch}/${path}`;
+}
+
+function getReleaseUrl(packageName: string, version: string): string | undefined {
+  const config = getPackageConfig(packageName);
+  if (!config) {
+    return undefined;
+  }
+
+  const { repo, pkg } = config;
+  const tagBase =
+    pkg.cratesPath ||
+    pkg.npmPath?.replace(/^@/, "").replace(/\//g, "-") ||
+    pkg.name.replace(/^@/, "").replace(/\//g, "-");
+  const tagName = `${tagBase}-v${version}`;
+
+  return `${repo.repoUrl}/releases/tag/${tagName}`;
+}
+
 export async function generatePagesAndTableData(
   packageData: PackageData,
   outputDir: string = baseDir,
 ) {
-  console.log("generating table...");
+  console.log("Generating table...");
   await writeTableData(packageData, outputDir);
-  console.log("generating pages...");
+  console.log("Generating pages...");
   writePageData(packageData, outputDir);
   writeLatestVersions(packageData);
 }
@@ -59,25 +114,30 @@ export function writePageData(
       join(workingDir, "all_versions.md"),
     );
 
-    // todo: fix tag url -
-    const url = data.npmData?.name || data.cratesData?.name;
-    allVersionsStream.write(getAllVersionsHead(packageName, url));
+    const changelogUrl = getChangelogUrl(packageName);
+    allVersionsStream.write(
+      getAllVersionsHead(packageName, changelogUrl || "#"),
+    );
 
     releases.forEach((release, i) => {
       const { version, notes, dateLabel } = release;
       const rawMd = parseMarkdown(notes, "markdown");
 
+      const releaseDateLabel = renderReleaseDateLabel(dateLabel);
+      const heading = `## v${version}`;
+
       allVersionsStream.write(
-        `\n\n## v${version}${renderReleaseDateLabel(dateLabel)}\n\n${rawMd}`,
+        `\n\n${heading}${releaseDateLabel ? `\n\n${releaseDateLabel}` : ""}\n\n${rawMd}`,
       );
+
+      const releaseUrl = getReleaseUrl(packageName, version);
 
       writeVersionPage({
         packageName,
         version,
         notes: rawMd,
         ...(dateLabel ? { releaseDateLabel: dateLabel } : {}),
-        // todo: fix tag url - should point either to the current release or the full changelog if the all version page
-        tag: packageName,
+        githubReleaseUrl: releaseUrl || changelogUrl || "#",
         workingDir,
         order: releases.length - i,
       });
