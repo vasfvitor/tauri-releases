@@ -1,5 +1,6 @@
 import { createWriteStream, mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { finished } from "node:stream/promises";
 import { baseDir, repositories } from "./config.js";
 import { parseAndSortChangelog } from "./scripts/parse.js";
 import {
@@ -76,7 +77,7 @@ export async function generatePagesAndTableData(
 ) {
   const releasesByPackage = buildReleasesByPackage(packageData);
   await writeTableData(packageData, releasesByPackage, outputDir);
-  writePageData(packageData, releasesByPackage, outputDir);
+  await writePageData(packageData, releasesByPackage, outputDir);
   writeLatestVersions(packageData, releasesByPackage);
 }
 
@@ -100,12 +101,14 @@ export function buildReleasesByPackage(
   return releasesByPackage;
 }
 
-export function writePageData(
+export async function writePageData(
   packageData: PackageData,
   releasesByPackage: ReleasesByPackage,
   outputDir: string = baseDir,
-): void {
-  Object.entries(packageData).forEach(([packageName, data]) => {
+): Promise<void> {
+  const streamFinalizers: Promise<void>[] = [];
+
+  for (const [packageName, data] of Object.entries(packageData)) {
     const fullName = `${data.group || ""}/${packageName}`;
 
     const workingDir = join(outputDir, fullName);
@@ -148,7 +151,10 @@ export function writePageData(
     });
 
     allVersionsStream.end();
-  });
+    streamFinalizers.push(finished(allVersionsStream));
+  }
+
+  await Promise.all(streamFinalizers);
 }
 
 export async function writeTableData(
@@ -212,6 +218,7 @@ export async function writeTableData(
   // close
   stream.write("]\n}");
   stream.end();
+  await finished(stream);
 }
 
 export function withReleaseDates(
