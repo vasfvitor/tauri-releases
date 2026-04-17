@@ -5,7 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "build": "tsx ./build.ts"
+    "build": "tsx ./build.ts",
+    "refresh": "tsx ./build.ts --refresh"
   },
   "keywords": [],
   "author": "",

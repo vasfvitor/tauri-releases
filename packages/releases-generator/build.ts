@@ -10,13 +10,13 @@ async function buildSite() {
   const dataFilePath = join("generated", "data.json");
   let packageData: PackageData;
 
-  if (existsSync(dataFilePath)) {
+  if (process.argv.includes("--refresh") || !existsSync(dataFilePath)) {
+    packageData = await fetchData(repositories);
+    writeOutput(packageData, "data.json");
+  } else {
     console.log("Skipping versions fetch - data.json already exists");
     const rawData = readFileSync(dataFilePath, "utf-8");
     packageData = JSON.parse(rawData);
-  } else {
-    packageData = await fetchData(repositories);
-    writeOutput(packageData, "data.json");
   }
 
   try {
