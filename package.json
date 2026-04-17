@@ -21,8 +21,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.12",
     "typescript": "^6.0.2",
-    "vitepress": "^1.6.3",
-    "vitepress-sidebar": "^1.33.0"
+    "vitepress": "^1.6.3"
   },
   "dependencies": {
     "@tanstack/vue-table": "^8.21.3",

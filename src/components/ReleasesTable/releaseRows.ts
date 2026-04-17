@@ -18,26 +18,6 @@ export function getReleaseMajor(version: string): string {
   return `v${match[1]}`;
 }
 
-export function buildMajorGroups(rows: TableData[]): ReleaseMajorGroup[] {
-  const groups: ReleaseMajorGroup[] = [];
-  const groupByLabel = new Map<string, ReleaseMajorGroup>();
-
-  for (const row of rows) {
-    const label = getReleaseMajor(row.version);
-    let group = groupByLabel.get(label);
-
-    if (!group) {
-      group = { label, rows: [] };
-      groupByLabel.set(label, group);
-      groups.push(group);
-    }
-
-    group.rows.push(row);
-  }
-
-  return groups;
-}
-
 function getDateTime(value: string | undefined): number {
   if (!value) {
     return Number.NEGATIVE_INFINITY;

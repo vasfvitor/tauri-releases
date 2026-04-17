@@ -81,9 +81,7 @@ export async function generatePagesAndTableData(
   writeLatestVersions(packageData, releasesByPackage);
 }
 
-export function buildReleasesByPackage(
-  packageData: PackageData,
-): ReleasesByPackage {
+function buildReleasesByPackage(packageData: PackageData): ReleasesByPackage {
   const releasesByPackage: ReleasesByPackage = new Map();
   for (const [packageName, data] of Object.entries(packageData)) {
     if (!data.changelogs) {
@@ -101,7 +99,7 @@ export function buildReleasesByPackage(
   return releasesByPackage;
 }
 
-export async function writePageData(
+async function writePageData(
   packageData: PackageData,
   releasesByPackage: ReleasesByPackage,
   outputDir: string = baseDir,
@@ -157,7 +155,7 @@ export async function writePageData(
   await Promise.all(streamFinalizers);
 }
 
-export async function writeTableData(
+async function writeTableData(
   packageData: PackageData,
   releasesByPackage: ReleasesByPackage,
   outputDir: string = baseDir,
@@ -221,7 +219,7 @@ export async function writeTableData(
   await finished(stream);
 }
 
-export function withReleaseDates(
+function withReleaseDates(
   releases: Release[],
   data: PackageData[string],
 ): ReleaseWithDate[] {

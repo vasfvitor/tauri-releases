@@ -1,30 +1,30 @@
 import type { ReleasesByPackage } from "./pageGenerator.js";
 import type { PackageData, RepoPackage, Repository } from "./types.js";
 
-export interface LatestVersionsEntry {
+interface LatestVersionsEntry {
   crate?: string;
   npm?: string;
 }
 
-export type LatestVersionsMap = Record<string, LatestVersionsEntry>;
+type LatestVersionsMap = Record<string, LatestVersionsEntry>;
 
-export interface PackageLink {
+interface PackageLink {
   name: string;
   href: string;
 }
 
-export interface VersionPill {
+interface VersionPill {
   label: "crate" | "npm";
   version: string;
 }
 
-export interface HomeSummaryPackage {
+interface HomeSummaryPackage {
   description: string;
   links: PackageLink[];
   versions: VersionPill[];
 }
 
-export interface HomeSummaryRepo {
+interface HomeSummaryRepo {
   displayName: string;
   repoUrl: string;
   repoSlug: string;

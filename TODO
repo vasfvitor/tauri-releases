@@ -2,8 +2,7 @@
 
 - improve the dir structure so that generated goes to /content/generated but keeps the url structure - or maybe  /content/release
 - edit url
-- action to build weekly
-- warning about last update
+- warning about last updated
 - report issue url
 - issue template?
 - update to vitepress 2 when it goes live, andsidebar updates to vitepress 2

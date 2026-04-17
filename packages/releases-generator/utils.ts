@@ -23,7 +23,7 @@ export function parseMarkdown(
   return "";
 }
 
-export function entitify(str: string): string {
+function entitify(str: string): string {
   return str
     .replace(/[&<>"']/g, (entity) => {
       switch (entity) {

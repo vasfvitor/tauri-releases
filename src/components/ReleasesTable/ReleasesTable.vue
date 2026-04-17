@@ -13,7 +13,7 @@ import { loadReleaseData } from "../releaseData";
 // biome-ignore lint/correctness/noUnusedImports: Used by the Vue template.
 import ChangelogDialog from "./ChangelogDialog.vue";
 import { createColumns } from "./columns";
-import { buildMajorGroups, sortReleasesByDateDesc } from "./releaseRows";
+import { sortReleasesByDateDesc } from "./releaseRows";
 
 const repoList = ref<string[]>([]);
 const packages = ref<Record<string, string[]>>({});

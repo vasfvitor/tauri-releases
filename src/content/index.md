@@ -16,6 +16,3 @@ import ReleasesTable from '../components/ReleasesTable/ReleasesTable.vue';
 
 <PackageGroups />
 
-<ClientOnly>
-  <ReleasesTable />
-</ClientOnly>
