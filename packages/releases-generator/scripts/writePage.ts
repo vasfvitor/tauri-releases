@@ -35,9 +35,9 @@ export function writeVersionPage(params: {
   const header = `<ReleaseHeader href="${githubReleaseUrl}" />`;
 
   const date = renderReleaseDateLabel(releaseDateLabel);
-  const tags = ["# {{ $frontmatter.title }}"].join("\n\n");
+  const tags = [`# {{ $frontmatter.title }}${date}`].join("\n\n");
 
-  const content = `${frontmatter}\n\n${header}\n\n${tags}${date ? `\n\n${date}` : ""}\n\n${notes}`;
+  const content = `${frontmatter}\n\n${header}\n\n${tags}\n\n${notes}`;
   const fileName = `v${version}.md`;
 
   writeFileSync(join(workingDir, fileName), content);
@@ -48,10 +48,13 @@ export function renderReleaseDateLabel(date: string | undefined): string {
     return "";
   }
 
-  return `<div class="release-date-row"><small class="release-date">${date}</small></div>`;
+  return ` <small class="release-date">${date}</small>`;
 }
 
-export function getAllVersionsHead(packageName: string, githubUrl: string): string {
+export function getAllVersionsHead(
+  packageName: string,
+  githubUrl: string,
+): string {
   const frontmatter = [
     note,
     `title: '${packageName} - full changelog'`,

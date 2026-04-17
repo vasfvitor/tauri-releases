@@ -62,7 +62,10 @@ function getChangelogUrl(packageName: string): string | undefined {
   return `${repo.repoUrl}/blob/${branch}/${path}`;
 }
 
-function getReleaseUrl(packageName: string, version: string): string | undefined {
+function getReleaseUrl(
+  packageName: string,
+  version: string,
+): string | undefined {
   const config = getPackageConfig(packageName);
   if (!config) {
     return undefined;
@@ -124,11 +127,9 @@ export function writePageData(
       const rawMd = parseMarkdown(notes, "markdown");
 
       const releaseDateLabel = renderReleaseDateLabel(dateLabel);
-      const heading = `## v${version}`;
+      const heading = `## v${version}${releaseDateLabel}`;
 
-      allVersionsStream.write(
-        `\n\n${heading}${releaseDateLabel ? `\n\n${releaseDateLabel}` : ""}\n\n${rawMd}`,
-      );
+      allVersionsStream.write(`\n\n${heading}\n\n${rawMd}`);
 
       const releaseUrl = getReleaseUrl(packageName, version);
 
