@@ -3,6 +3,7 @@
 node_modules
 
 packages/releases-generator/.cache
+packages/releases-generator/success.log
 
 /.vitepress/.temp
 .vitepress/config.mts.timestamp-*.mjs
@@ -16,4 +17,3 @@ src/content/wry
 src/content/plugins-workspace
 src/content/index.md
 src/content/tableData.json
-src/content/public/tableData.json
