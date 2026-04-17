@@ -23,6 +23,7 @@ const renderedRepos = buildHomeSummaryRepos(repositories, latestVersions);
             <th scope="col">Component</th>
             <th scope="col">Description</th>
             <th scope="col">Version</th>
+            <th scope="col">Date</th>
           </tr>
         </thead>
         <tbody>
@@ -35,16 +36,13 @@ const renderedRepos = buildHomeSummaryRepos(repositories, latestVersions);
             </td>
             <td class="description-cell">{{ pkg.description }}</td>
             <td class="version-cell">
-              <span
-                v-for="pill in pkg.versions"
-                :key="`${pill.label}-${pill.version}`"
-                class="version-pill"
-                :class="`version-pill--${pill.label}`"
-              >
+              <span v-for="pill in pkg.versions" :key="`${pill.label}-${pill.version}`" class="version-pill"
+                :class="`version-pill--${pill.label}`">
                 <span class="version-pill__label">{{ pill.label }}</span>
                 <span class="version-pill__value">{{ pill.version }}</span>
               </span>
             </td>
+            <td class="release-date-cell">{{ pkg.latestReleaseDateLabel || "-" }}</td>
           </tr>
         </tbody>
       </table>
@@ -127,6 +125,11 @@ const renderedRepos = buildHomeSummaryRepos(repositories, latestVersions);
 .component-cell,
 .version-cell {
   white-space: nowrap;
+}
+
+.release-date-cell {
+  white-space: nowrap;
+  color: var(--vp-c-text-2);
 }
 
 .component-link {

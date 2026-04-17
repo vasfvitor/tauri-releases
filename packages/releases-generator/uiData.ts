@@ -4,6 +4,7 @@ import type { PackageData, RepoPackage, Repository } from "./types.js";
 interface LatestVersionsEntry {
   crate?: string;
   npm?: string;
+  dateLabel?: string;
 }
 
 type LatestVersionsMap = Record<string, LatestVersionsEntry>;
@@ -22,6 +23,7 @@ interface HomeSummaryPackage {
   description: string;
   links: PackageLink[];
   versions: VersionPill[];
+  latestReleaseDateLabel?: string;
 }
 
 interface HomeSummaryRepo {
@@ -90,6 +92,8 @@ export function buildHomeSummaryRepos(
         pkg,
         latestVersions[getLatestVersionKey(repo.name, pkg.name)],
       ),
+      latestReleaseDateLabel:
+        latestVersions[getLatestVersionKey(repo.name, pkg.name)]?.dateLabel,
     })),
   }));
 }
@@ -119,8 +123,9 @@ export function buildLatestVersions(
   const latestVersions: LatestVersionsMap = {};
 
   for (const [packageName, data] of Object.entries(packageData)) {
-    const latestRelease = releasesByPackage.get(packageName)?.[0]?.version;
-    if (!latestRelease) {
+    const latestReleaseEntry = releasesByPackage.get(packageName)?.[0];
+    const latestRelease = latestReleaseEntry?.version;
+    if (!latestReleaseEntry || !latestRelease) {
       continue;
     }
 
@@ -135,6 +140,10 @@ export function buildLatestVersions(
       entry.npm = latestRelease;
     }
 
+    if (latestReleaseEntry.dateLabel) {
+      entry.dateLabel = latestReleaseEntry.dateLabel;
+    }
+
     if (entry.crate || entry.npm) {
       latestVersions[key] = entry;
     }
@@ -147,7 +156,7 @@ export function formatLatestVersionsModule(
   latestVersions: LatestVersionsMap,
 ): string {
   const lines = [
-    "export const latestVersions: Record<string, { crate?: string; npm?: string }> = {",
+    "export const latestVersions: Record<string, { crate?: string; npm?: string; dateLabel?: string }> = {",
   ];
 
   for (const [key, value] of Object.entries(latestVersions).sort(([a], [b]) =>
