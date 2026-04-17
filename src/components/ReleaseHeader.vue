@@ -3,7 +3,7 @@
 const back = () => history.back();
 
 defineProps<{
-    href?: string;
+  href?: string;
 }>();
 </script>
 

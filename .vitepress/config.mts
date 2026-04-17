@@ -13,7 +13,12 @@ export default defineConfig({
   srcDir,
   metaChunk: true,
   base: "/tauri-releases/",
-  head: [["link", { rel: "prefetch", href: "/tauri-releases/tableData.json", as: "fetch" }]],
+  head: [
+    [
+      "link",
+      { rel: "prefetch", href: "/tauri-releases/tableData.json", as: "fetch" },
+    ],
+  ],
   themeConfig: {
     sidebar: sidebarData,
     siteTitle: false,

@@ -127,7 +127,9 @@ export function writePageData(
 
       const heading = `\n\n## v${version}\n\n`;
       const releaseDateLabel = renderReleaseDateLabel(dateLabel);
-      const content = [heading, releaseDateLabel, rawMd].filter(Boolean).join("\n\n");
+      const content = [heading, releaseDateLabel, rawMd]
+        .filter(Boolean)
+        .join("\n\n");
       allVersionsStream.write(content);
 
       const releaseUrl = config

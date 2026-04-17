@@ -36,7 +36,9 @@ export function writeVersionPage(params: {
 
   const date = renderReleaseDateLabel(releaseDateLabel);
   const heading = `# {{ $frontmatter.title }}`;
-  const content = [frontmatter, header, heading, date, notes].filter(Boolean).join("\n\n");
+  const content = [frontmatter, header, heading, date, notes]
+    .filter(Boolean)
+    .join("\n\n");
   const fileName = `v${version}.md`;
 
   writeFileSync(join(workingDir, fileName), content);

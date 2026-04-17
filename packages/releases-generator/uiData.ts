@@ -80,7 +80,9 @@ export function buildHomeSummaryRepos(
   return repositories.map((repo) => ({
     displayName: repo.displayName,
     repoUrl: repo.repoUrl,
-    repoSlug: repo.repoUrl.replace("https://github.com/", "").replace(/\/$/, ""),
+    repoSlug: repo.repoUrl
+      .replace("https://github.com/", "")
+      .replace(/\/$/, ""),
     packages: repo.packages.map((pkg) => ({
       description: pkg.description,
       links: buildPackageLinks(pkg),
@@ -92,7 +94,9 @@ export function buildHomeSummaryRepos(
   }));
 }
 
-export function buildPackageGroupLinks(repositories: Repository[]): PackageLink[] {
+export function buildPackageGroupLinks(
+  repositories: Repository[],
+): PackageLink[] {
   return repositories.map((repo) => {
     const firstPackage = repo.packages[0];
     const packageName = firstPackage?.name ?? repo.name;
@@ -158,4 +162,3 @@ export function formatLatestVersionsModule(
   lines.push("};", "");
   return lines.join("\n");
 }
-
