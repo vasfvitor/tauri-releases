@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Moved — tauri.app/release</title>
+<script>
+(function () {
+  // Old prototype URLs: /tauri-releases/<repo>/<package>/<version>.html
+  // Official site:      https://tauri.app/release/<package>/<version>
+  var seg = location.pathname
+    .replace(/^\/tauri-releases\/?/, '')
+    .replace(/\.html$/, '')
+    .split('/')
+    .filter(Boolean);
+  var target = 'https://tauri.app/release/';
+  if (seg.length >= 2) target += seg[seg.length - 2] + '/' + seg[seg.length - 1];
+  location.replace(target);
+})();
+</script>
+</head>
+<body>
+<p>This prototype has moved. Browse Tauri release notes at
+<a href="https://tauri.app/release/">tauri.app/release</a>.</p>
+</body>
+</html>

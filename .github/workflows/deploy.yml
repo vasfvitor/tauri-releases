@@ -1,9 +1,9 @@
-name: Deploy VitePress site to Pages
+name: Deploy redirect stub to Pages
+
+# Final deploy before archiving: replaces the prototype site with a
+# client-side redirect to the official https://tauri.app/release/
 
 on:
-  # push:
-    # branches: [master]
-
   workflow_dispatch:
 
 permissions:
@@ -16,42 +16,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 
-      - uses: pnpm/action-setup@v3
-      #   with:
-      #     version: 9 # Not needed if you've set "packageManager" in package.json
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build VitePress
-        run: pnpm docs:build
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .vitepress/dist
-
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
     runs-on: ubuntu-latest
-    name: Deploy
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: redirect-stub
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
